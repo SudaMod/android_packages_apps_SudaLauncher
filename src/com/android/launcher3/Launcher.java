@@ -5300,6 +5300,26 @@ public class Launcher extends Activity
     }
 
     /**
+     * Some shortcuts were updated in the background.
+     *
+     * Implementation of the method from LauncherModel.Callbacks.
+     */
+    public void bindShortcutsUpdated(final ArrayList<ShortcutInfo> shortcuts) {
+        Runnable r = new Runnable() {
+            public void run() {
+                bindShortcutsUpdated(shortcuts);
+            }
+        };
+        if (waitUntilResume(r)) {
+            return;
+        }
+
+        if (mWorkspace != null) {
+            mWorkspace.updateShortcuts(shortcuts);
+        }
+    }
+
+    /**
      * Update the state of a package, typically related to install state.
      * <p/>
      * Implementation of the method from LauncherModel.Callbacks.
