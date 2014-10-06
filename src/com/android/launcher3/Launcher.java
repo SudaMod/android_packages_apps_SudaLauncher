@@ -190,7 +190,6 @@ public class Launcher extends Activity
     static final int SCREEN_COUNT = 5;
     static final int DEFAULT_SCREEN = 2;
 
-    private static final String PREFERENCES = "launcher.preferences";
     // To turn on these properties, type
     // adb shell setprop log.tag.PROPERTY_NAME [VERBOSE | SUPPRESS]
     static final String DUMP_STATE_PROPERTY = "launcher_dump_state";
@@ -729,7 +728,7 @@ public class Launcher extends Activity
     private static void readConfiguration(Context context, LocaleConfiguration configuration) {
         DataInputStream in = null;
         try {
-            in = new DataInputStream(context.openFileInput(PREFERENCES));
+            in = new DataInputStream(context.openFileInput(LauncherFiles.LAUNCHER_PREFS));
             configuration.locale = in.readUTF();
             configuration.mcc = in.readInt();
             configuration.mnc = in.readInt();
@@ -749,7 +748,8 @@ public class Launcher extends Activity
     private static void writeConfiguration(Context context, LocaleConfiguration configuration) {
         DataOutputStream out = null;
         try {
-            out = new DataOutputStream(context.openFileOutput(PREFERENCES, MODE_PRIVATE));
+            out = new DataOutputStream(context.openFileOutput(
+                    LauncherFiles.LAUNCHER_PREFS, MODE_PRIVATE));
             out.writeUTF(configuration.locale);
             out.writeInt(configuration.mcc);
             out.writeInt(configuration.mnc);
@@ -758,7 +758,7 @@ public class Launcher extends Activity
             // Ignore
         } catch (IOException e) {
             //noinspection ResultOfMethodCallIgnored
-            context.getFileStreamPath(PREFERENCES).delete();
+            context.getFileStreamPath(LauncherFiles.LAUNCHER_PREFS).delete();
         } finally {
             if (out != null) {
                 try {
