@@ -81,7 +81,6 @@ import android.text.TextUtils;
 import android.text.method.TextKeyListener;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.ContextThemeWrapper;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.HapticFeedbackConstants;
@@ -2925,7 +2924,7 @@ public class Launcher extends Activity
 
     private void showBrokenAppInstallDialog(final String packageName,
             DialogInterface.OnClickListener onSearchClickListener) {
-        new AlertDialog.Builder(new ContextThemeWrapper(this, android.R.style.Theme_DeviceDefault))
+        new AlertDialog.Builder(this)
                 .setTitle(R.string.abandoned_promises_title)
                 .setMessage(R.string.abandoned_promise_explanation)
                 .setPositiveButton(R.string.abandoned_search, onSearchClickListener)
