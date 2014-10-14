@@ -1762,7 +1762,7 @@ public class Launcher extends Activity
 
         boolean foundCellSpan = false;
 
-        ShortcutInfo info = mModel.infoFromShortcutIntent(this, data, null);
+        ShortcutInfo info = mModel.infoFromShortcutIntent(this, data);
         if (info == null) {
             return;
         }
