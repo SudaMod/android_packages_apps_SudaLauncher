@@ -1769,8 +1769,7 @@ public class LauncherModel extends BroadcastReceiver
         }
 
         // check & update map of what's occupied; used to discard overlapping/invalid items
-        private boolean checkItemPlacement(HashMap<Long, ItemInfo[][]> occupied, ItemInfo item,
-                                           AtomicBoolean deleteOnInvalidPlacement) {
+        private boolean checkItemPlacement(HashMap<Long, ItemInfo[][]> occupied, ItemInfo item) {
             LauncherAppState app = LauncherAppState.getInstance();
             DeviceProfile grid = app.getDynamicGrid().getDeviceProfile();
             final int countX = (int) grid.numColumns;
@@ -1781,7 +1780,6 @@ public class LauncherModel extends BroadcastReceiver
                 // Return early if we detect that an item is under the hotseat button
                 if (mCallbacks == null || mCallbacks.get() == null ||
                         mCallbacks.get().isAllAppsButtonRank((int) item.screenId)) {
-                    deleteOnInvalidPlacement.set(true);
                     Log.e(TAG, "Error loading shortcut into hotseat " + item
                             + " into position (" + item.screenId + ":" + item.cellX + ","
                             + item.cellY + ") occupied by all apps");
@@ -1838,7 +1836,6 @@ public class LauncherModel extends BroadcastReceiver
                 } else {
                     // see if widget can be shrunk to fit a screen, if not, just remove it
                     if (item.minSpanX > countX || item.minSpanY > countY) {
-                        deleteOnInvalidPlacement.set(true);
                         return false;
                     }
                     // if the widget is larger than the grid, shrink it down
@@ -2051,7 +2048,6 @@ public class LauncherModel extends BroadcastReceiver
                     UserHandleCompat user;
 
                     while (!mStopped && c.moveToNext()) {
-                        AtomicBoolean deleteOnInvalidPlacement = new AtomicBoolean(false);
                         try {
                             int itemType = c.getInt(itemTypeIndex);
                             boolean restored = 0 != c.getInt(restoredIndex);
@@ -2229,11 +2225,8 @@ public class LauncherModel extends BroadcastReceiver
                                     }
 
                                     // check & update map of what's occupied
-                                    deleteOnInvalidPlacement.set(false);
-                                    if (!checkItemPlacement(occupied, info, deleteOnInvalidPlacement)) {
-                                        if (deleteOnInvalidPlacement.get()) {
-                                            itemsToRemove.add(id);
-                                        }
+                                    if (!checkItemPlacement(occupied, info)) {
+                                        itemsToRemove.add(id);
                                         break;
                                     }
 
@@ -2275,12 +2268,8 @@ public class LauncherModel extends BroadcastReceiver
                                 folderInfo.hidden = c.getInt(hiddenIndex) > 0;
 
                                 // check & update map of what's occupied
-                                deleteOnInvalidPlacement.set(false);
-                                if (!checkItemPlacement(occupied, folderInfo,
-                                        deleteOnInvalidPlacement)) {
-                                    if (deleteOnInvalidPlacement.get()) {
-                                        itemsToRemove.add(id);
-                                    }
+                                if (!checkItemPlacement(occupied, folderInfo)) {
+                                    itemsToRemove.add(id);
                                     break;
                                 }
 
@@ -2388,12 +2377,8 @@ public class LauncherModel extends BroadcastReceiver
 
                                     appWidgetInfo.container = c.getInt(containerIndex);
                                     // check & update map of what's occupied
-                                    deleteOnInvalidPlacement.set(false);
-                                    if (!checkItemPlacement(occupied, appWidgetInfo,
-                                            deleteOnInvalidPlacement)) {
-                                        if (deleteOnInvalidPlacement.get()) {
-                                            itemsToRemove.add(id);
-                                        }
+                                    if (!checkItemPlacement(occupied, appWidgetInfo)) {
+                                        itemsToRemove.add(id);
                                         break;
                                     }
 
