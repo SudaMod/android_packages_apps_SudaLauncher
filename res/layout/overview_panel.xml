@@ -14,8 +14,9 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<com.android.launcher3.OverviewPanel xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:slidingpanel="http://schemas.android.com/apk/res/com.android.launcher3"
+    android:id="@+id/sliding_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="bottom">
@@ -42,4 +43,4 @@
 
     <include layout="@layout/settings_pane" />
 
-</FrameLayout>
+</com.android.launcher3.OverviewPanel>
