@@ -552,12 +552,6 @@ public class Launcher extends Activity
         // set orientation depending on user configuration
         unlockScreenOrientation(true);
 
-        if (shouldShowIntroScreen()) {
-            showIntroScreen();
-        } else {
-            showFirstRunActivity();
-            showFirstRunClings();
-        }
         if (mLauncherCallbacks != null) {
             mLauncherCallbacks.onCreate(savedInstanceState);
             if (mLauncherCallbacks.hasLauncherOverlay()) {
@@ -568,6 +562,14 @@ public class Launcher extends Activity
                 mWorkspace.setLauncherOverlay(mLauncherOverlay);
             }
         }
+
+        if (shouldShowIntroScreen()) {
+            showIntroScreen();
+        } else {
+            showFirstRunActivity();
+            showFirstRunClings();
+        }
+
         IntentFilter protectedAppsFilter = new IntentFilter(
                 "cyanogenmod.intent.action.PROTECTED_COMPONENT_UPDATE");
         registerReceiver(protectedAppsChangedReceiver, protectedAppsFilter,
@@ -5951,6 +5953,9 @@ public class Launcher extends Activity
         if (introScreen != null) {
             mDragLayer.showOverlayView(introScreen);
         }
+        if (mLauncherOverlayContainer != null) {
+            mLauncherOverlayContainer.setVisibility(View.INVISIBLE);
+        }
     }
 
     public void dismissIntroScreen() {
@@ -5962,11 +5967,17 @@ public class Launcher extends Activity
                 @Override
                 public void run() {
                     mDragLayer.dismissOverlayView();
+                    if (mLauncherOverlayContainer != null) {
+                        mLauncherOverlayContainer.setVisibility(View.VISIBLE);
+                    }
                     showFirstRunClings();
                 }
             }, ACTIVITY_START_DELAY);
         } else {
             mDragLayer.dismissOverlayView();
+            if (mLauncherOverlayContainer != null) {
+                mLauncherOverlayContainer.setVisibility(View.VISIBLE);
+            }
             showFirstRunClings();
         }
         changeWallpaperVisiblity(true);
