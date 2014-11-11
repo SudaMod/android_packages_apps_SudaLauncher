@@ -425,10 +425,6 @@ public class Launcher extends Activity
 
     FocusIndicatorView mFocusHandler;
 
-    public static boolean isPropertyEnabled(String propertyName) {
-        return Log.isLoggable(propertyName, Log.VERBOSE);
-    }
-
     Runnable mUpdateDynamicGridRunnable = new Runnable() {
         @Override
         public void run() {
@@ -2809,7 +2805,7 @@ public class Launcher extends Activity
                 case KeyEvent.KEYCODE_HOME:
                     return true;
                 case KeyEvent.KEYCODE_VOLUME_DOWN:
-                    if (isPropertyEnabled(DUMP_STATE_PROPERTY)) {
+                    if (Utilities.isPropertyEnabled(DUMP_STATE_PROPERTY)) {
                         dumpState();
                         return true;
                     }
@@ -5399,14 +5395,8 @@ public class Launcher extends Activity
         return oriMap[(d.getRotation() + indexOffset) % 4];
     }
 
-    public boolean isRotationEnabled() {
-        boolean enableRotation = SettingsProvider.getIntCustomDefault(this,
-                SettingsProvider.SETTINGS_UI_GLOBAL_ORIENTATION, 0) == 0;
-        return enableRotation;
-    }
-
     public void lockScreenOrientation() {
-        if (isRotationEnabled()) {
+        if (Utilities.isRotationEnabled(this)) {
             setRequestedOrientation(mapConfigurationOriActivityInfoOri(getResources()
                     .getConfiguration().orientation));
         }

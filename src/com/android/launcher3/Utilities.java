@@ -52,6 +52,8 @@ import android.util.SparseArray;
 import android.view.View;
 import android.widget.Toast;
 
+import com.android.launcher3.settings.SettingsProvider;
+
 import java.util.ArrayList;
 
 /**
@@ -140,13 +142,13 @@ public final class Utilities {
         icon.setBounds(0, 0, sIconWidth, sIconHeight);
     }
 
-    private static boolean isPropertyEnabled(String propertyName) {
+    public static boolean isPropertyEnabled(String propertyName) {
         return Log.isLoggable(propertyName, Log.VERBOSE);
     }
 
     public static boolean isRotationEnabled(Context c) {
-        boolean enableRotation = sForceEnableRotation ||
-                c.getResources().getBoolean(R.bool.allow_rotation);
+        boolean enableRotation = SettingsProvider.getIntCustomDefault(c,
+                SettingsProvider.SETTINGS_UI_GLOBAL_ORIENTATION, 0) == 0;
         return enableRotation;
     }
 
