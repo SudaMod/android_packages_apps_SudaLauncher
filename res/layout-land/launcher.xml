@@ -17,7 +17,7 @@
 <!-- Full screen view projects under the status bar and contains the background -->
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:launcher="http://schemas.android.com/apk/res-auto/com.android.launcher3"
+    xmlns:launcher="http://schemas.android.com/apk/res-auto"
 
     android:id="@+id/launcher"
     android:layout_width="match_parent"
@@ -62,5 +62,10 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:visibility="invisible" />
+
+        <FrameLayout
+            android:id="@+id/container_preferences"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
     </com.android.launcher3.DragLayer>
 </FrameLayout>

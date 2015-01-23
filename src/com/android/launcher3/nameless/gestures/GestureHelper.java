@@ -34,6 +34,14 @@ public class GestureHelper {
     private static final boolean DEBUG = false;
     private static GestureHelper sInstance;
 
+    public static final String TYPE_SWIPE_DOWN_LEFT = "type_swipe_down_left";
+    public static final String TYPE_SWIPE_DOWN_MIDDLE = "type_swipe_down_middle";
+    public static final String TYPE_SWIPE_DOWN_RIGHT = "type_swipe_down_right";
+    public static final String TYPE_SWIPE_UP_LEFT = "type_swipe_up_left";
+    public static final String TYPE_SWIPE_UP_MIDDLE = "type_swipe_up_middle";
+    public static final String TYPE_SWIPE_UP_RIGHT = "type_swipe_up_right";
+    public static final String TYPE_DOUBLE_TAP = "type_double_tap";
+
     private static final int SWIPE_MAX_OFF_PATH = 250;
     private static final int SWIPE_THRESHOLD_VELOCITY = 200;
 
@@ -77,21 +85,21 @@ public class GestureHelper {
     public void updateActions(final Context context) {
         log("updateActions");
         sTypeSwipeDownLeft = SettingsProvider.getIntCustomDefault(context,
-                GestureFragment.TYPE_SWIPE_DOWN_LEFT, ActionProcessor.ACTION_EXPAND_STATUSBAR);
+                TYPE_SWIPE_DOWN_LEFT, ActionProcessor.ACTION_EXPAND_STATUSBAR);
         sTypeSwipeDownMiddle = SettingsProvider.getIntCustomDefault(context,
-                GestureFragment.TYPE_SWIPE_DOWN_MIDDLE, ActionProcessor.ACTION_EXPAND_STATUSBAR);
+                TYPE_SWIPE_DOWN_MIDDLE, ActionProcessor.ACTION_EXPAND_STATUSBAR);
         sTypeSwipeDownRight = SettingsProvider.getIntCustomDefault(context,
-                GestureFragment.TYPE_SWIPE_DOWN_RIGHT, ActionProcessor.ACTION_EXPAND_STATUSBAR);
+                TYPE_SWIPE_DOWN_RIGHT, ActionProcessor.ACTION_EXPAND_STATUSBAR);
 
         sTypeSwipeUpLeft = SettingsProvider.getIntCustomDefault(context,
-                GestureFragment.TYPE_SWIPE_UP_LEFT, ActionProcessor.ACTION_NOTHING);
+                TYPE_SWIPE_UP_LEFT, ActionProcessor.ACTION_NOTHING);
         sTypeSwipeUpMiddle = SettingsProvider.getIntCustomDefault(context,
-                GestureFragment.TYPE_SWIPE_UP_MIDDLE, ActionProcessor.ACTION_NOTHING);
+                TYPE_SWIPE_UP_MIDDLE, ActionProcessor.ACTION_NOTHING);
         sTypeSwipeUpRight = SettingsProvider.getIntCustomDefault(context,
-                GestureFragment.TYPE_SWIPE_UP_RIGHT, ActionProcessor.ACTION_NOTHING);
+                TYPE_SWIPE_UP_RIGHT, ActionProcessor.ACTION_NOTHING);
 
         sTypeDoubleTap = SettingsProvider.getIntCustomDefault(context,
-                GestureFragment.TYPE_DOUBLE_TAP, ActionProcessor.ACTION_TURN_SCREEN_OFF);
+                TYPE_DOUBLE_TAP, ActionProcessor.ACTION_TURN_SCREEN_OFF);
     }
 
     public Gesture getGesture(float upX, float upY, float downX, float downY) {

@@ -148,7 +148,7 @@ public class GestureHeaderAdapter extends PinnedHeaderListAdapter {
             builder.setSingleChoiceItems(R.array.gesture_entries, selected,
                     new DialogInterface.OnClickListener() {
                         @Override public void onClick(DialogInterface dialogInterface, int i) {
-                            SettingsProvider.putInt(getContext(), type, i);
+                            SettingsProvider.putString(getContext(), type, String.valueOf(i));
                             GestureHelper.get(getContext()).updateActions(getContext());
                             viewHolder.state.setText(ActionProcessor.getGestureById(i));
                             dialogInterface.dismiss();

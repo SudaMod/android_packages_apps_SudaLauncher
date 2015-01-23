@@ -2128,9 +2128,8 @@ public class Workspace extends SmoothPagedView
 
         updateDefaultScreenButton();
 
-        SettingsProvider.get(mLauncher).edit()
-                .putLong(SettingsProvider.SETTINGS_UI_HOMESCREEN_DEFAULT_SCREEN_ID, mDefaultScreenId)
-                .commit();
+        SettingsProvider.putLong(mLauncher,
+                SettingsProvider.SETTINGS_UI_HOMESCREEN_DEFAULT_SCREEN_ID, mDefaultScreenId);
     }
 
     private void getOverviewModePages(int[] range) {
@@ -2198,8 +2197,6 @@ public class Workspace extends SmoothPagedView
     }
 
     public void exitOverviewMode(int snapPage, boolean animated) {
-        ((SlidingUpPanelLayout) mLauncher.getOverviewPanel()).collapsePane();
-
         enableOverviewMode(false, snapPage, animated);
     }
 
@@ -2518,7 +2515,6 @@ public class Workspace extends SmoothPagedView
             float mOverviewPanelSlideScale = 1.0f;
 
             if (overviewToWorkspace || stateIsNormal) {
-                ((SlidingUpPanelLayout) overviewPanel).collapsePane();
                 overviewPanel.setScaleY(1.0f);
                 mOverviewPanelSlideScale = 3.0f;
             } else if (workspaceToOverview || stateIsOverview) {

@@ -20,6 +20,7 @@ package com.android.launcher3.nameless.gestures;
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.app.Fragment;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.MatrixCursor;
@@ -36,14 +37,6 @@ import com.android.launcher3.R;
 
 public class GestureFragment extends Fragment {
     public static final String TAG = "GESTURE_FRAGMENT";
-
-    public static final String TYPE_SWIPE_DOWN_LEFT = "type_swipe_down_left";
-    public static final String TYPE_SWIPE_DOWN_MIDDLE = "type_swipe_down_middle";
-    public static final String TYPE_SWIPE_DOWN_RIGHT = "type_swipe_down_right";
-    public static final String TYPE_SWIPE_UP_LEFT = "type_swipe_up_left";
-    public static final String TYPE_SWIPE_UP_MIDDLE = "type_swipe_up_middle";
-    public static final String TYPE_SWIPE_UP_RIGHT = "type_swipe_up_right";
-    public static final String TYPE_DOUBLE_TAP = "type_double_tap";
 
     private static final int POS_SWIPE_DOWN = 0;
     private static final int POS_SWIPE_UP = 1;
@@ -95,7 +88,6 @@ public class GestureFragment extends Fragment {
                 R.string.gesture_double_tap
         };
 
-
         mGestureHeaderAdapter = new GestureHeaderAdapter(getActivity());
         mGestureHeaderAdapter.setHeaders(headers);
         mGestureHeaderAdapter.addPartition(false, true);
@@ -124,29 +116,13 @@ public class GestureFragment extends Fragment {
             DisplayMetrics displaymetrics = new DisplayMetrics();
             getActivity().getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
             int width = displaymetrics.widthPixels;
-            final ObjectAnimator anim = ObjectAnimator.ofFloat(this, "translationX", width, 0);
-
-            final View darkPanel = ((Launcher) getActivity()).getDarkPanel();
-            darkPanel.setVisibility(View.VISIBLE);
-            ObjectAnimator anim2 = ObjectAnimator.ofFloat(
-                    darkPanel, "alpha", 0.0f, 0.3f);
-            anim2.start();
-
-            anim.addListener(new Animator.AnimatorListener() {
-                @Override
-                public void onAnimationStart(Animator arg0) {}
-
-                @Override
-                public void onAnimationRepeat(Animator arg0) {}
-
-                @Override
-                public void onAnimationEnd(Animator arg0) {
-                    darkPanel.setVisibility(View.GONE);
-                }
-
-                @Override
-                public void onAnimationCancel(Animator arg0) {}
-            });
+            Configuration config = getResources().getConfiguration();
+            final ObjectAnimator anim;
+            if (config.getLayoutDirection() == View.LAYOUT_DIRECTION_RTL) {
+                anim = ObjectAnimator.ofFloat(this, "translationX", -width, 0);
+            } else {
+                anim = ObjectAnimator.ofFloat(this, "translationX", width, 0);
+            }
 
             return anim;
         }

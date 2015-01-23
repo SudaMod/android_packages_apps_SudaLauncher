@@ -162,18 +162,6 @@ public class DynamicGridSizeFragment extends Fragment
                 anim = ObjectAnimator.ofFloat(this, "translationX", width, 0);
             }
 
-            final View darkPanel = ((Launcher) getActivity()).getDarkPanel();
-            darkPanel.setVisibility(View.VISIBLE);
-            ObjectAnimator anim2 = ObjectAnimator.ofFloat(darkPanel, "alpha", 0.0f, 0.3f);
-            anim2.start();
-
-            anim.addListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd (Animator animation) {
-                    darkPanel.setVisibility(View.GONE);
-                }
-            });
-
             return anim;
         } else {
             return super.onCreateAnimator(transit, enter, nextAnim);

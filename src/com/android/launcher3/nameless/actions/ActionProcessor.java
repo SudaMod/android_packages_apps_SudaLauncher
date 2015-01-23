@@ -33,7 +33,7 @@ import android.view.KeyEvent;
 import com.android.launcher3.LauncherApplication;
 import com.android.launcher3.R;
 import com.android.launcher3.nameless.Utils;
-import com.android.launcher3.nameless.gestures.GestureFragment;
+import com.android.launcher3.nameless.gestures.GestureHelper;
 import com.android.launcher3.settings.SettingsProvider;
 
 public class ActionProcessor {
@@ -85,21 +85,21 @@ public class ActionProcessor {
         switch (title) {
             // swipe down
             case R.string.gesture_swipe_down_left:
-                return GestureFragment.TYPE_SWIPE_DOWN_LEFT;
+                return GestureHelper.TYPE_SWIPE_DOWN_LEFT;
             case R.string.gesture_swipe_down_middle:
-                return GestureFragment.TYPE_SWIPE_DOWN_MIDDLE;
+                return GestureHelper.TYPE_SWIPE_DOWN_MIDDLE;
             case R.string.gesture_swipe_down_right:
-                return GestureFragment.TYPE_SWIPE_DOWN_RIGHT;
+                return GestureHelper.TYPE_SWIPE_DOWN_RIGHT;
             // swipe up
             case R.string.gesture_swipe_up_left:
-                return GestureFragment.TYPE_SWIPE_UP_LEFT;
+                return GestureHelper.TYPE_SWIPE_UP_LEFT;
             case R.string.gesture_swipe_up_middle:
-                return GestureFragment.TYPE_SWIPE_UP_MIDDLE;
+                return GestureHelper.TYPE_SWIPE_UP_MIDDLE;
             case R.string.gesture_swipe_up_right:
-                return GestureFragment.TYPE_SWIPE_UP_RIGHT;
+                return GestureHelper.TYPE_SWIPE_UP_RIGHT;
             // special
             case R.string.gesture_double_tap:
-                return GestureFragment.TYPE_DOUBLE_TAP;
+                return GestureHelper.TYPE_DOUBLE_TAP;
             // nothing
             default:
                 return LauncherApplication.getStr(R.string.gesture_nothing);

@@ -191,26 +191,6 @@ public class TransitionEffectsFragment extends Fragment {
                 anim = ObjectAnimator.ofFloat(this, "translationX", width, 0);
             }
 
-            final View darkPanel = ((Launcher) getActivity()).getDarkPanel();
-            darkPanel.setVisibility(View.VISIBLE);
-            ObjectAnimator anim2 = ObjectAnimator.ofFloat(
-                   darkPanel , "alpha", 0.0f, 0.3f);
-            anim2.start();
-
-            anim.addListener(new Animator.AnimatorListener() {
-                @Override
-                public void onAnimationStart(Animator arg0) {}
-                @Override
-                public void onAnimationRepeat(Animator arg0) {}
-                @Override
-                public void onAnimationEnd(Animator arg0) {
-                    darkPanel.setVisibility(View.GONE);
-                    setImageViewToEffect();
-                }
-                @Override
-                public void onAnimationCancel(Animator arg0) {}
-            });
-
             return anim;
         } else {
             return super.onCreateAnimator(transit, enter, nextAnim);

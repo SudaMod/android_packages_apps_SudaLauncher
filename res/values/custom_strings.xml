@@ -17,6 +17,7 @@
 <resources>
     <!-- Gestures -->
     <string name="gesture_settings">Gestures</string>
+    <string name="gesture_summary">Define different actions for gestures</string>
     <string name="gesture_choose">Choose action</string>
     <!-- Gesture categories -->
     <string name="gesture_swipe_down">Swipe down</string>
@@ -49,8 +50,17 @@
     <string name="landscape_reverse">Landscape reversed</string>
 
     <string name="hide_status_bar_title">Hide status bar</string>
-    <string name="hide">Hide</string>
-    <string name="show">Show</string>
+    <string name="hide_icon_labels">Hide icon labels</string>
+    <string name="hide_icon_labels_drawer_summary">Removes the icon labels of apps in your app drawer</string>
+    <string name="hide_icon_labels_home_summary">Removes the icon labels of apps on your home screen</string>
+    <string name="show_search_bar">Show search bar</string>
+    <string name="show_search_bar_summary">Shows the search bar on your home screen if Google Now is installed</string>
+
+    <string name="scrolling_wallpaper_summary">Scrolls the wallpaper together with your home screens</string>
+    <string name="scroll_effect_drawer_summary">Configure the effect when scrolling through your app drawer</string>
+    <string name="scroll_effect_home_summary">Configure the effect when scrolling through your home screens</string>
+    <string name="grid_size_summary">Configure the grid size of your home screen</string>
+    <string name="protected_app_summary">Configure protected apps</string>
 
     <string name="no_last_app">No last app found!</string>
 </resources>

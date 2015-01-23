@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+        android:key="category_global"
+        android:title="@string/global_settings">
+
+        <ListPreference
+            android:key="global_orientation"
+            android:title="@string/screen_orientation"
+            android:entries="@array/global_orientation_entries"
+            android:entryValues="@array/global_orientation_values"
+            android:defaultValue="0" />
+
+        <SwitchPreference
+            android:key="global_hide_status_bar"
+            android:title="@string/hide_status_bar_title"
+            android:defaultValue="false" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="category_home"
+        android:title="@string/home_screen_settings">
+
+        <SwitchPreference
+            android:key="homescreen_search"
+            android:title="@string/show_search_bar"
+            android:summary="@string/show_search_bar_summary"
+            android:defaultValue="true" />
+
+        <SwitchPreference
+            android:key="homescreen_hide_icon_labels"
+            android:title="@string/hide_icon_labels"
+            android:summary="@string/hide_icon_labels_home_summary"
+            android:defaultValue="false" />
+
+        <SwitchPreference
+            android:key="homescreen_scrolling_wallpaper_scroll"
+            android:title="@string/scrolling_wallpaper"
+            android:defaultValue="true" />
+
+        <Preference
+            android:key="scroll_effect_home"
+            android:title="@string/scroll_effect_text"
+            android:summary="@string/scroll_effect_home_summary" />
+
+        <Preference
+            android:key="grid_size"
+            android:title="@string/grid_size_text"
+            android:summary="@string/grid_size_summary" />
+
+        <Preference
+            android:key="gestures"
+            android:title="@string/gesture_settings"
+            android:summary="@string/gesture_summary" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="category_drawer"
+        android:title="@string/drawer_settings">
+
+        <ListPreference
+            android:key="drawer_sort_mode"
+            android:title="@string/drawer_sorting_text"
+            android:entries="@array/drawer_sort_mode_entries"
+            android:entryValues="@array/drawer_sort_mode_values"
+            android:defaultValue="0" />
+
+        <SwitchPreference
+            android:key="drawer_hide_icon_labels"
+            android:title="@string/hide_icon_labels"
+            android:summary="@string/hide_icon_labels_drawer_summary"
+            android:defaultValue="false" />
+
+        <Preference
+            android:key="scroll_effect_drawer"
+            android:title="@string/scroll_effect_text"
+            android:summary="@string/scroll_effect_drawer_summary" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="category_apps"
+        android:title="@string/app_settings">
+
+        <SwitchPreference
+            android:key="general_icons_large"
+            android:title="@string/larger_icons_text"
+            android:defaultValue="false" />
+
+        <Preference
+            android:key="protected_apps"
+            android:title="@string/protected_app_settings"
+            android:summary="@string/protected_app_summary" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

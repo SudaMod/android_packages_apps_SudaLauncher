@@ -15,6 +15,7 @@
      limitations under the License.
 -->
 <resources xmlns:xliff="http://schemas.android.com/apk/res/android">
+    <!-- Gestures -->
     <string-array name="gesture_entries" translatable="false">
         <item>@string/gesture_nothing</item>
         <item>@string/gesture_turn_screen_off</item>
@@ -26,4 +27,31 @@
         <item>@string/gesture_music_next</item>
         <item>@string/gesture_toggle_last_app</item>
     </string-array>
+    <!-- Screen orientation -->
+    <string-array name="global_orientation_entries" translatable="false">
+        <item>@string/automatic</item>
+        <item>@string/portrait</item>
+        <item>@string/portrait_reverse</item>
+        <item>@string/landscape</item>
+        <item>@string/landscape_reverse</item>
+    </string-array>
+    <string-array name="global_orientation_values" translatable="false">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+    </string-array>
+    <!-- Drawer sort mode -->
+    <string-array name="drawer_sort_mode_entries" translatable="false">
+        <item>@string/sort_mode_title</item>
+        <item>@string/sort_mode_launch_count</item>
+        <item>@string/sort_mode_install_time</item>
+    </string-array>
+    <string-array name="drawer_sort_mode_values" translatable="false">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
 </resources>
