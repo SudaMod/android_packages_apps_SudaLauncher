@@ -21,6 +21,7 @@ package com.android.launcher3.nameless.actions;
 import android.app.StatusBarManager;
 import android.content.Context;
 import android.content.Intent;
+import android.hardware.TorchManager;
 import android.media.AudioManager;
 import android.os.PowerManager;
 import android.os.RemoteException;
@@ -177,9 +178,8 @@ public class ActionProcessor {
     }
 
     public static void toggleTorch(final Context context) {
-        final Intent torchIntent = new Intent(Intent.ACTION_TOGGLE_FLASHLIGHT);
-        torchIntent.addFlags(Intent.FLAG_RECEIVER_FOREGROUND);
-        context.sendBroadcast(torchIntent);
+        final TorchManager tm = (TorchManager) context.getSystemService(Context.TORCH_SERVICE);
+        tm.setTorchEnabled(!tm.isTorchOn());
     }
 
     public static void musicPlayPause(final Context context) {

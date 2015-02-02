@@ -79,6 +79,7 @@
     <uses-permission android:name="cyanogenmod.permission.PROTECTED_APP" />
 
     <!-- Additions -->
+    <uses-permission android:name="android.permission.ACCESS_TORCH_SERVICE" />
     <uses-permission android:name="android.permission.DEVICE_POWER" />
     <uses-permission android:name="android.permission.EXPAND_STATUS_BAR" />
 
