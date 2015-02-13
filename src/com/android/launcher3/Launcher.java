@@ -5636,6 +5636,7 @@ public class Launcher extends Activity
         mGrid.layout(Launcher.this);
 
         // Synchronized reload
+        mModel.stopLoader(); //make sure the loader isn't running
         mModel.startLoader(true, page);
         mWorkspace.updateCustomContentVisibility();
 
