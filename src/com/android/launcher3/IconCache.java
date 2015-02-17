@@ -87,6 +87,9 @@ public class IconCache {
 
         @Override
         public boolean equals(Object o) {
+            if (!(o instanceof CacheKey)) {
+                return false;
+            }
             CacheKey other = (CacheKey) o;
             return other.componentName.equals(componentName) && other.user.equals(user);
         }
@@ -469,10 +472,7 @@ public class IconCache {
                 resourceFile.write(buffer, 0, buffer.length);
             } else {
                 Log.w(TAG, "failed to encode cache for " + key);
-                return;
             }
-        } catch (FileNotFoundException e) {
-            Log.w(TAG, "failed to pre-load cache for " + key, e);
         } catch (IOException e) {
             Log.w(TAG, "failed to pre-load cache for " + key, e);
         } finally {

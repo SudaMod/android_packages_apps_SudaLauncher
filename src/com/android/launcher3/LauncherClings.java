@@ -63,59 +63,9 @@ class LauncherClings implements OnClickListener {
     @Override
     public void onClick(View v) {
         int id = v.getId();
-        if (id == R.id.cling_dismiss_migration_use_default) {
-            // Disable the migration cling
-            dismissMigrationCling();
-        } else if (id == R.id.cling_dismiss_migration_copy_apps) {
-            // Copy the shortcuts from the old database
-            LauncherModel model = mLauncher.getModel();
-            model.resetLoadedState(false, true);
-            model.startLoader(false, PagedView.INVALID_RESTORE_PAGE,
-                    LauncherModel.LOADER_FLAG_CLEAR_WORKSPACE
-                            | LauncherModel.LOADER_FLAG_MIGRATE_SHORTCUTS);
-            // Set the flag to skip the folder cling
-            String spKey = LauncherAppState.getSharedPreferencesKey();
-            SharedPreferences sp = mLauncher.getSharedPreferences(spKey, Context.MODE_PRIVATE);
-            SharedPreferences.Editor editor = sp.edit();
-            editor.putBoolean(Launcher.USER_HAS_MIGRATED, true);
-            editor.apply();
-            // Disable the migration cling
-            dismissMigrationCling();
-        } else if (id == R.id.cling_dismiss_longpress_info) {
+        if (id == R.id.cling_dismiss_longpress_info) {
             dismissLongPressCling();
         }
-    }
-
-    /**
-     * Shows the migration cling.
-     *
-     * This flow is mutually exclusive with showFirstRunCling, and only runs if this Launcher
-     * package was not preinstalled and there exists a db to migrate from.
-     */
-    public void showMigrationCling() {
-        mLauncher.hideWorkspaceSearchAndHotseat();
-
-        ViewGroup root = (ViewGroup) mLauncher.findViewById(R.id.launcher);
-        View inflated = mInflater.inflate(R.layout.migration_cling, root);
-        inflated.findViewById(R.id.cling_dismiss_migration_copy_apps).setOnClickListener(this);
-        inflated.findViewById(R.id.cling_dismiss_migration_use_default).setOnClickListener(this);
-    }
-
-    private void dismissMigrationCling() {
-        mLauncher.showWorkspaceSearchAndHotseat();
-        Runnable dismissCb = new Runnable() {
-            public void run() {
-                Runnable cb = new Runnable() {
-                    public void run() {
-                        // Show the longpress cling next
-                        showLongPressCling(false);
-                    }
-                };
-                dismissCling(mLauncher.findViewById(R.id.migration_cling), cb,
-                        MIGRATION_CLING_DISMISSED_KEY, DISMISS_CLING_DURATION);
-            }
-        };
-        mLauncher.getWorkspace().post(dismissCb);
     }
 
     public void showLongPressCling(boolean showWelcome) {

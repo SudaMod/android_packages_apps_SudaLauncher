@@ -1201,7 +1201,7 @@ public abstract class PagedView extends ViewGroup implements ViewGroup.OnHierarc
     public void removeViewAt(int index) {
         // XXX: We should find a better way to hook into this before the view
         // gets removed form its parent...
-        removeViewAt(index);
+        removeMarkerForView(index);
         super.removeViewAt(index);
     }
     @Override
@@ -2936,10 +2936,10 @@ public abstract class PagedView extends ViewGroup implements ViewGroup.OnHierarc
         super.onInitializeAccessibilityNodeInfo(info);
         info.setScrollable(getPageCount() > 1);
         if (getCurrentPage() < getPageCount() - 1) {
-            info.addAction(AccessibilityNodeInfo.ACTION_SCROLL_FORWARD);
+            info.addAction(AccessibilityNodeInfo.AccessibilityAction.ACTION_SCROLL_FORWARD);
         }
         if (getCurrentPage() > 0) {
-            info.addAction(AccessibilityNodeInfo.ACTION_SCROLL_BACKWARD);
+            info.addAction(AccessibilityNodeInfo.AccessibilityAction.ACTION_SCROLL_BACKWARD);
         }
     }
 

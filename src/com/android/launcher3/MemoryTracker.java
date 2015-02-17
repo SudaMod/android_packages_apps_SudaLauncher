@@ -115,7 +115,7 @@ public class MemoryTracker extends Service {
     void updatePidsArrayL() {
         final int N = mPids.size();
         mPidsArray = new int[N];
-        StringBuffer sb = new StringBuffer("Now tracking processes: ");
+        StringBuilder sb = new StringBuilder("Now tracking processes: ");
         for (int i=0; i<N; i++) {
             final int p = mPids.get(i).intValue();
             mPidsArray[i] = p;

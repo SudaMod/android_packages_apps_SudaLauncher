@@ -137,9 +137,6 @@ public class DragLayer extends FrameLayout implements ViewGroup.OnHierarchyChang
                 continue;
             }
             setInsets(child, insets, mInsets);
-            if (child.getId() == R.id.search_drop_target_bar) {
-                continue;
-            }
         }
         mInsets.set(insets);
         return true; // I'll take it from here

@@ -1192,9 +1192,9 @@ public class LauncherProvider extends ContentProvider {
 
         public void checkId(String table, ContentValues values) {
             long id = values.getAsLong(LauncherSettings.BaseLauncherColumns._ID);
-            if (table == LauncherProvider.TABLE_WORKSPACE_SCREENS) {
+            if (LauncherProvider.TABLE_WORKSPACE_SCREENS.equals(table)) {
                 mMaxScreenId = Math.max(id, mMaxScreenId);
-            }  else {
+            } else {
                 mMaxItemId = Math.max(id, mMaxItemId);
             }
         }

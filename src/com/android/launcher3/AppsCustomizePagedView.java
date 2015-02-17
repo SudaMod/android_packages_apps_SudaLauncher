@@ -1109,8 +1109,6 @@ public class AppsCustomizePagedView extends PagedViewWithDraggableItems implemen
         int endIndex = isCTFlag ? ctEndIndex : defEndIndex ;
 
         layout.removeAllViewsOnPage();
-        ArrayList<Object> items = new ArrayList<Object>();
-        ArrayList<Bitmap> images = new ArrayList<Bitmap>();
         boolean hideIconLabels = SettingsProvider.getBoolean(mLauncher,
                 SettingsProvider.SETTINGS_UI_DRAWER_HIDE_ICON_LABELS,
                 R.bool.preferences_interface_drawer_hide_icon_labels_default);
@@ -1136,9 +1134,6 @@ public class AppsCustomizePagedView extends PagedViewWithDraggableItems implemen
                 x = mCellCountX - x - 1;
             }
             layout.addViewToCellLayout(icon, -1, i, new CellLayout.LayoutParams(x,y, 1,1), false);
-
-            items.add(info);
-            images.add(info.iconBitmap);
         }
 
         enableHwLayersOnVisiblePages();
@@ -2032,17 +2027,13 @@ public class AppsCustomizePagedView extends PagedViewWithDraggableItems implemen
             }
 
             final String[] preApps = prePackageContext.getResources().getStringArray(resId);
-            int size = preApps.length;
 
             if(isPreInstallClass){
                 mPreInstallConfig = true;
             }
 
             arrayList.clear();
-
-            for (int i=0; i<size; i++) {
-                arrayList.add(preApps[i]);
-            }
+            Collections.addAll(arrayList, preApps);
         }
     }
 

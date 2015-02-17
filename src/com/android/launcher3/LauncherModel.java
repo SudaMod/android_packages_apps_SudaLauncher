@@ -99,13 +99,11 @@ public class LauncherModel extends BroadcastReceiver
     public static final boolean UPGRADE_USE_MORE_APPS_FOLDER = false;
     public static final int LOADER_FLAG_NONE = 0;
     public static final int LOADER_FLAG_CLEAR_WORKSPACE = 1 << 0;
-    public static final int LOADER_FLAG_MIGRATE_SHORTCUTS = 1 << 1;
 
     private static final int ITEMS_CHUNK = 6; // batch size for the workspace icons
     private static final long INVALID_SCREEN_ID = -1L;
 
     private final boolean mAppsCanBeOnRemoveableStorage;
-    private final boolean mOldContentProviderExists;
 
     private final LauncherAppState mApp;
     private final Object mLock = new Object();
@@ -118,8 +116,6 @@ public class LauncherModel extends BroadcastReceiver
     // clear all queued binding runnables when the Launcher activity is destroyed.
     private static final int MAIN_THREAD_NORMAL_RUNNABLE = 0;
     private static final int MAIN_THREAD_BINDING_RUNNABLE = 1;
-
-    private static final String MIGRATE_AUTHORITY = "com.android.launcher2.settings";
 
     private static final HandlerThread sWorkerThread = new HandlerThread("launcher-loader");
     static {
@@ -259,7 +255,7 @@ public class LauncherModel extends BroadcastReceiver
             mHandler.post(new Runnable() {
                 public void run() {
                     Callbacks cb = mCallbacks != null ? mCallbacks.get() : null;
-                    if (callbacks == cb && cb != null) {
+                    if (callbacks == cb) {
                         callbacks.bindAppsUpdated(unreadChangeFinal);
                     }
                 }
@@ -278,22 +274,7 @@ public class LauncherModel extends BroadcastReceiver
 
         mAppsCanBeOnRemoveableStorage = Environment.isExternalStorageRemovable();
         String oldProvider = context.getString(R.string.old_launcher_provider_uri);
-        // This may be the same as MIGRATE_AUTHORITY, or it may be replaced by a different
-        // resource string.
-        String redirectAuthority = Uri.parse(oldProvider).getAuthority();
-        ProviderInfo providerInfo =
-                context.getPackageManager().resolveContentProvider(MIGRATE_AUTHORITY, 0);
-        ProviderInfo redirectProvider =
-                context.getPackageManager().resolveContentProvider(redirectAuthority, 0);
-
         Log.d(TAG, "Old launcher provider: " + oldProvider);
-        mOldContentProviderExists = (providerInfo != null) && (redirectProvider != null);
-
-        if (mOldContentProviderExists) {
-            Log.d(TAG, "Old launcher provider exists.");
-        } else {
-            Log.d(TAG, "Old launcher provider does not exist.");
-        }
 
         mApp = app;
         mBgAllAppsList = new AllAppsList(iconCache, appFilter);
@@ -329,10 +310,6 @@ public class LauncherModel extends BroadcastReceiver
             // If we are not on the worker thread, then post to the worker handler
             sWorker.post(r);
         }
-    }
-
-    boolean canMigrateFromOldLauncherDb(Launcher launcher) {
-        return mOldContentProviderExists && !launcher.isLauncherPreinstalled() ;
     }
 
     static boolean findNextAvailableIconSpaceInScreen(ArrayList<ItemInfo> items, int[] xy,
@@ -1958,15 +1935,9 @@ public class LauncherModel extends BroadcastReceiver
                 LauncherAppState.getLauncherProvider().deleteDatabase();
             }
 
-            if ((mFlags & LOADER_FLAG_MIGRATE_SHORTCUTS) != 0) {
-                // append the user's Launcher2 shortcuts
-                Launcher.addDumpLog(TAG, "loadWorkspace: migrating from launcher2", true);
-                LauncherAppState.getLauncherProvider().migrateLauncher2Shortcuts();
-            } else {
-                // Make sure the default workspace is loaded
-                Launcher.addDumpLog(TAG, "loadWorkspace: loading default favorites", false);
-                LauncherAppState.getLauncherProvider().loadDefaultFavoritesIfNecessary();
-            }
+            // Make sure the default workspace is loaded
+            Launcher.addDumpLog(TAG, "loadWorkspace: loading default favorites", false);
+            LauncherAppState.getLauncherProvider().loadDefaultFavoritesIfNecessary();
 
             // This code path is for our old migration code and should no longer be exercised
             boolean loadedOldDb = false;
@@ -2444,6 +2415,8 @@ public class LauncherModel extends BroadcastReceiver
                                 values, selectionBuilder.toString(), null);
                     } catch (RemoteException e) {
                         Log.w(TAG, "Could not update restored rows");
+                    } finally {
+                        updater.release();
                     }
                 }
 

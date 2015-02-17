@@ -236,8 +236,6 @@ public class Launcher extends Activity
     public static final String SHOW_WEIGHT_WATCHER = "debug.show_mem";
     public static final boolean SHOW_WEIGHT_WATCHER_DEFAULT = false;
 
-    public static final String USER_HAS_MIGRATED = "launcher.user_migrated_from_old_data";
-
     /** The different states that Launcher can be in. */
     private enum State { NONE, WORKSPACE, APPS_CUSTOMIZE, APPS_CUSTOMIZE_SPRING_LOADED };
     private State mState = State.WORKSPACE;
@@ -257,9 +255,9 @@ public class Launcher extends Activity
     private static final AtomicInteger sNextGeneratedId = new AtomicInteger(1);
 
     // How long to wait before the new-shortcut animation automatically pans the workspace
-    private static int NEW_APPS_PAGE_MOVE_DELAY = 500;
-    private static int NEW_APPS_ANIMATION_INACTIVE_TIMEOUT_SECONDS = 5;
-    private static int NEW_APPS_ANIMATION_DELAY = 500;
+    private static final int NEW_APPS_PAGE_MOVE_DELAY = 500;
+    private static final int NEW_APPS_ANIMATION_INACTIVE_TIMEOUT_SECONDS = 5;
+    private static final int NEW_APPS_ANIMATION_DELAY = 500;
     private static final int SINGLE_FRAME_DELAY = 16;
 
     private final BroadcastReceiver mCloseSystemDialogsReceiver
@@ -276,7 +274,6 @@ public class Launcher extends Activity
     private View mWeightWatcher;
     private TransitionEffectsFragment mTransitionEffectsFragment;
     private DynamicGridSizeFragment mDynamicGridSizeFragment;
-    private LauncherClings mLauncherClings;
     protected HiddenFolderFragment mHiddenFolderFragment;
     private GestureFragment mGestureFragment;
 
@@ -1954,11 +1951,6 @@ public class Launcher extends Activity
                 mModel.resetLoadedState(false, true);
                 mModel.startLoader(false, PagedView.INVALID_RESTORE_PAGE,
                         LauncherModel.LOADER_FLAG_CLEAR_WORKSPACE);
-            } else if (ENABLE_DEBUG_INTENTS && DebugIntents.MIGRATE_DATABASE.equals(action)) {
-                mModel.resetLoadedState(false, true);
-                mModel.startLoader(false, PagedView.INVALID_RESTORE_PAGE,
-                        LauncherModel.LOADER_FLAG_CLEAR_WORKSPACE
-                                | LauncherModel.LOADER_FLAG_MIGRATE_SHORTCUTS);
             } else if (LauncherAppsCompat.ACTION_MANAGED_PROFILE_ADDED.equals(action)
                     || LauncherAppsCompat.ACTION_MANAGED_PROFILE_REMOVED.equals(action)) {
                 getModel().forceReload();
@@ -1979,7 +1971,6 @@ public class Launcher extends Activity
         filter.addAction(LauncherAppsCompat.ACTION_MANAGED_PROFILE_REMOVED);
         if (ENABLE_DEBUG_INTENTS) {
             filter.addAction(DebugIntents.DELETE_DATABASE);
-            filter.addAction(DebugIntents.MIGRATE_DATABASE);
         }
         registerReceiver(mReceiver, filter);
         FirstFrameAnimatorHelper.initializeDrawListener(getWindow().getDecorView());
@@ -1992,41 +1983,17 @@ public class Launcher extends Activity
      * Sets up transparent navigation and status bars in LMP.
      * This method is a no-op for other platform versions.
      */
-    @TargetApi(19)
     private void setupTransparentSystemBarsForLmp() {
-        // TODO(sansid): use the APIs directly when compiling against L sdk.
-        // Currently we use reflection to access the flags and the API to set the transparency
-        // on the System bars.
-        if (Utilities.isLmpOrAbove()) {
-            try {
-                getWindow().getAttributes().systemUiVisibility |=
-                        (View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
-                getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS
-                        | WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
-                Field drawsSysBackgroundsField = WindowManager.LayoutParams.class.getField(
-                        "FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS");
-                getWindow().addFlags(drawsSysBackgroundsField.getInt(null));
+        getWindow().getAttributes().systemUiVisibility |=
+                (View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS
+                | WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
 
-                Method setStatusBarColorMethod =
-                        Window.class.getDeclaredMethod("setStatusBarColor", int.class);
-                Method setNavigationBarColorMethod =
-                        Window.class.getDeclaredMethod("setNavigationBarColor", int.class);
-                setStatusBarColorMethod.invoke(getWindow(), Color.TRANSPARENT);
-                setNavigationBarColorMethod.invoke(getWindow(), Color.TRANSPARENT);
-            } catch (NoSuchFieldException e) {
-                Log.w(TAG, "NoSuchFieldException while setting up transparent bars");
-            } catch (NoSuchMethodException ex) {
-                Log.w(TAG, "NoSuchMethodException while setting up transparent bars");
-            } catch (IllegalAccessException e) {
-                Log.w(TAG, "IllegalAccessException while setting up transparent bars");
-            } catch (IllegalArgumentException e) {
-                Log.w(TAG, "IllegalArgumentException while setting up transparent bars");
-            } catch (InvocationTargetException e) {
-                Log.w(TAG, "InvocationTargetException while setting up transparent bars");
-            } finally {}
-        }
+        getWindow().setStatusBarColor(Color.TRANSPARENT);
+        getWindow().setNavigationBarColor(Color.TRANSPARENT);
     }
 
     @Override
@@ -3228,9 +3195,8 @@ public class Launcher extends Activity
 
             Bundle optsBundle = null;
             if (useLaunchAnimation) {
-                ActivityOptions opts = Utilities.isLmpOrAbove() ?
-                        ActivityOptions.makeCustomAnimation(this, R.anim.task_open_enter, R.anim.no_anim) :
-                        ActivityOptions.makeScaleUpAnimation(v, 0, 0, v.getMeasuredWidth(), v.getMeasuredHeight());
+                ActivityOptions opts =  ActivityOptions.makeCustomAnimation(this,
+                        R.anim.task_open_enter, R.anim.no_anim);
                 optsBundle = opts.toBundle();
             }
 
@@ -3339,9 +3305,7 @@ public class Launcher extends Activity
 
         ObjectAnimator oa = LauncherAnimUtils.ofPropertyValuesHolder(mFolderIconImageView, alpha,
                 scaleX, scaleY);
-        if (Utilities.isLmpOrAbove()) {
-            oa.setInterpolator(new LogDecelerateInterpolator(100, 0));
-        }
+        oa.setInterpolator(new LogDecelerateInterpolator(100, 0));
         oa.setDuration(getResources().getInteger(R.integer.config_folderExpandDuration));
         oa.start();
     }
@@ -3630,17 +3594,12 @@ public class Launcher extends Activity
             mStateAnimation = null;
         }
 
-        boolean material = Utilities.isLmpOrAbove();
-
         final Resources res = getResources();
 
-        final int duration = res.getInteger(R.integer.config_appsCustomizeZoomInTime);
-        final int fadeDuration = res.getInteger(R.integer.config_appsCustomizeFadeInTime);
         final int revealDuration = res.getInteger(R.integer.config_appsCustomizeRevealTime);
         final int itemsAlphaStagger =
                 res.getInteger(R.integer.config_appsCustomizeItemsAlphaStagger);
 
-        final float scale = (float) res.getInteger(R.integer.config_appsCustomizeZoomScaleFactor);
         final View fromView = mWorkspace;
         final AppsCustomizeTabHost toView = mAppsCustomizeTabHost;
 
@@ -3667,8 +3626,6 @@ public class Launcher extends Activity
             final View page = content.getPageAt(content.getCurrentPage());
             final View revealView = toView.findViewById(R.id.fake_page);
 
-            final float initialPanelAlpha = 1f;
-
             final boolean isWidgetTray = contentType == AppsCustomizePagedView.ContentType.Widgets;
             if (isWidgetTray) {
                 revealView.setBackground(res.getDrawable(R.drawable.quantum_panel_dark));
@@ -3693,22 +3650,13 @@ public class Launcher extends Activity
             int[] allAppsToPanelDelta = Utilities.getCenterDeltaInScreenSpace(revealView,
                     getAllAppsButton(), null);
 
-            float alpha = 0;
-            float xDrift = 0;
-            float yDrift = 0;
-            if (material) {
-                alpha = isWidgetTray ? 0.3f : 1f;
-                yDrift = isWidgetTray ? height / 2 : allAppsToPanelDelta[1];
-                xDrift = isWidgetTray ? 0 : allAppsToPanelDelta[0];
-            } else {
-                yDrift = 2 * height / 3;
-                xDrift = 0;
-            }
-            final float initAlpha = alpha;
+            final float alpha = isWidgetTray ? 0.3f : 1f;
+            final float xDrift = isWidgetTray ? 0 : allAppsToPanelDelta[0];
+            final float yDrift = isWidgetTray ? height / 2 : allAppsToPanelDelta[1];
 
             revealView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
             layerViews.add(revealView);
-            PropertyValuesHolder panelAlpha = PropertyValuesHolder.ofFloat("alpha", initAlpha, 1f);
+            PropertyValuesHolder panelAlpha = PropertyValuesHolder.ofFloat("alpha", alpha, 1f);
             PropertyValuesHolder panelDriftY =
                     PropertyValuesHolder.ofFloat("translationY", yDrift, 0);
             PropertyValuesHolder panelDriftX =
@@ -3749,30 +3697,29 @@ public class Launcher extends Activity
             indicatorsAlpha.setDuration(revealDuration);
             mStateAnimation.play(indicatorsAlpha);
 
-            if (material) {
-                final View allApps = getAllAppsButton();
-                int allAppsButtonSize = LauncherAppState.getInstance().
-                        getDynamicGrid().getDeviceProfile().allAppsButtonVisualSize;
-                float startRadius = isWidgetTray ? 0 : allAppsButtonSize / 2;
-                Animator reveal = ViewAnimationUtils.createCircularReveal(revealView, width / 2,
-                                height / 2, startRadius, revealRadius);
-                reveal.setDuration(revealDuration);
-                reveal.setInterpolator(new LogDecelerateInterpolator(100, 0));
+            final View allApps = getAllAppsButton();
+            int allAppsButtonSize = LauncherAppState.getInstance().
+                    getDynamicGrid().getDeviceProfile().allAppsButtonVisualSize;
+            float startRadius = isWidgetTray ? 0 : allAppsButtonSize / 2;
+            Animator reveal = ViewAnimationUtils.createCircularReveal(revealView, width / 2,
+                    height / 2, startRadius, revealRadius);
+            reveal.setDuration(revealDuration);
+            reveal.setInterpolator(new LogDecelerateInterpolator(100, 0));
 
-                reveal.addListener(new AnimatorListenerAdapter() {
-                    public void onAnimationStart(Animator animation) {
-                        if (!isWidgetTray) {
-                            allApps.setVisibility(View.INVISIBLE);
-                        }
+            reveal.addListener(new AnimatorListenerAdapter() {
+                public void onAnimationStart(Animator animation) {
+                    if (!isWidgetTray) {
+                        allApps.setVisibility(View.INVISIBLE);
                     }
-                    public void onAnimationEnd(Animator animation) {
-                        if (!isWidgetTray) {
-                            allApps.setVisibility(View.VISIBLE);
-                        }
+                }
+
+                public void onAnimationEnd(Animator animation) {
+                    if (!isWidgetTray) {
+                        allApps.setVisibility(View.VISIBLE);
                     }
-                });
-                mStateAnimation.play(reveal);
-            }
+                }
+            });
+            mStateAnimation.play(reveal);
 
             mStateAnimation.addListener(new AnimatorListenerAdapter() {
                 @Override
@@ -3811,17 +3758,11 @@ public class Launcher extends Activity
                     dispatchOnLauncherTransitionStart(fromView, animated, false);
                     dispatchOnLauncherTransitionStart(toView, animated, false);
 
-                    revealView.setAlpha(initAlpha);
-                    if (Utilities.isLmpOrAbove()) {
-                        for (int i = 0; i < layerViews.size(); i++) {
-                            View v = layerViews.get(i);
-                            if (v != null) {
-                                boolean attached = true;
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                                    attached = v.isAttachedToWindow();
-                                }
-                                if (attached) v.buildLayer();
-                            }
+                    revealView.setAlpha(alpha);
+                    for (int i = 0; i < layerViews.size(); i++) {
+                        View v = layerViews.get(i);
+                        if (v != null) {
+                            if (v.isAttachedToWindow()) v.buildLayer();
                         }
                     }
                     mStateAnimation.start();
@@ -3867,17 +3808,12 @@ public class Launcher extends Activity
             mStateAnimation = null;
         }
 
-        boolean material = Utilities.isLmpOrAbove();
-        Resources res = getResources();
+        final Resources res = getResources();
 
-        final int duration = res.getInteger(R.integer.config_appsCustomizeZoomOutTime);
-        final int fadeOutDuration = res.getInteger(R.integer.config_appsCustomizeFadeOutTime);
         final int revealDuration = res.getInteger(R.integer.config_appsCustomizeConcealTime);
         final int itemsAlphaStagger =
                 res.getInteger(R.integer.config_appsCustomizeItemsAlphaStagger);
 
-        final float scaleFactor = (float)
-                res.getInteger(R.integer.config_appsCustomizeZoomScaleFactor);
         final View fromView = mAppsCustomizeTabHost;
         final View toView = mWorkspace;
         Animator workspaceAnim = null;
@@ -3943,20 +3879,11 @@ public class Launcher extends Activity
                 int[] allAppsToPanelDelta = Utilities.getCenterDeltaInScreenSpace(revealView,
                         allAppsButton, null);
 
-                float xDrift = 0;
-                float yDrift = 0;
-                if (material) {
-                    yDrift = isWidgetTray ? height / 2 : allAppsToPanelDelta[1];
-                    xDrift = isWidgetTray ? 0 : allAppsToPanelDelta[0];
-                } else {
-                    yDrift = 5 * height / 4;
-                    xDrift = 0;
-                }
+                final float xDrift = isWidgetTray ? 0 : allAppsToPanelDelta[0];
+                final float yDrift = isWidgetTray ? height / 2 : allAppsToPanelDelta[1];
 
                 revealView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
-                TimeInterpolator decelerateInterpolator = material ?
-                        new LogDecelerateInterpolator(100, 0) :
-                        new LogDecelerateInterpolator(30, 0);
+                TimeInterpolator decelerateInterpolator = new LogDecelerateInterpolator(100, 0);
 
                 // The vertical motion of the apps panel should be delayed by one frame
                 // from the conceal animation in order to give the right feel. We correpsondingly
@@ -3975,14 +3902,13 @@ public class Launcher extends Activity
                 panelDriftX.setInterpolator(decelerateInterpolator);
                 mStateAnimation.play(panelDriftX);
 
-                if (isWidgetTray || !material) {
-                    float finalAlpha = material ? 0.4f : 0f;
+                if (isWidgetTray) {
+                    float finalAlpha = 0.4f;
                     revealView.setAlpha(1f);
                     ObjectAnimator panelAlpha = LauncherAnimUtils.ofFloat(revealView, "alpha",
                             1f, finalAlpha);
                     panelAlpha.setDuration(revealDuration);
-                    panelAlpha.setInterpolator(material ? decelerateInterpolator :
-                        new AccelerateInterpolator(1.5f));
+                    panelAlpha.setInterpolator(decelerateInterpolator);
                     mStateAnimation.play(panelAlpha);
                 }
 
@@ -4014,31 +3940,29 @@ public class Launcher extends Activity
 
                 width = revealView.getMeasuredWidth();
 
-                if (material) {
-                    if (!isWidgetTray) {
-                        allAppsButton.setVisibility(View.INVISIBLE);
-                    }
-                    int allAppsButtonSize = LauncherAppState.getInstance().
-                            getDynamicGrid().getDeviceProfile().allAppsButtonVisualSize;
-                    float finalRadius = isWidgetTray ? 0 : allAppsButtonSize / 2;
-                    Animator reveal =
-                            LauncherAnimUtils.createCircularReveal(revealView, width / 2,
-                                    height / 2, revealRadius, finalRadius);
-                    reveal.setInterpolator(new LogDecelerateInterpolator(100, 0));
-                    reveal.setDuration(revealDuration);
-                    reveal.setStartDelay(itemsAlphaStagger);
-
-                    reveal.addListener(new AnimatorListenerAdapter() {
-                        public void onAnimationEnd(Animator animation) {
-                            revealView.setVisibility(View.INVISIBLE);
-                            if (!isWidgetTray) {
-                                allAppsButton.setVisibility(View.VISIBLE);
-                            }
-                        }
-                    });
-
-                    mStateAnimation.play(reveal);
+                if (!isWidgetTray) {
+                    allAppsButton.setVisibility(View.INVISIBLE);
                 }
+                int allAppsButtonSize = LauncherAppState.getInstance().
+                        getDynamicGrid().getDeviceProfile().allAppsButtonVisualSize;
+                float finalRadius = isWidgetTray ? 0 : allAppsButtonSize / 2;
+                Animator reveal =
+                        LauncherAnimUtils.createCircularReveal(revealView, width / 2,
+                                height / 2, revealRadius, finalRadius);
+                reveal.setInterpolator(new LogDecelerateInterpolator(100, 0));
+                reveal.setDuration(revealDuration);
+                reveal.setStartDelay(itemsAlphaStagger);
+
+                reveal.addListener(new AnimatorListenerAdapter() {
+                    public void onAnimationEnd(Animator animation) {
+                        revealView.setVisibility(View.INVISIBLE);
+                        if (!isWidgetTray) {
+                            allAppsButton.setVisibility(View.VISIBLE);
+                        }
+                    }
+                });
+
+                mStateAnimation.play(reveal);
 
                 dispatchOnLauncherTransitionPrepare(fromView, animated, true);
                 dispatchOnLauncherTransitionPrepare(toView, animated, true);
@@ -4089,16 +4013,10 @@ public class Launcher extends Activity
                     dispatchOnLauncherTransitionStart(fromView, animated, false);
                     dispatchOnLauncherTransitionStart(toView, animated, false);
 
-                    if (Utilities.isLmpOrAbove()) {
-                        for (int i = 0; i < layerViews.size(); i++) {
-                            View v = layerViews.get(i);
-                            if (v != null) {
-                                boolean attached = true;
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                                    attached = v.isAttachedToWindow();
-                                }
-                                if (attached) v.buildLayer();
-                            }
+                    for (int i = 0; i < layerViews.size(); i++) {
+                        View v = layerViews.get(i);
+                        if (v != null) {
+                            if (v.isAttachedToWindow()) v.buildLayer();
                         }
                     }
                     mStateAnimation.start();
@@ -4878,7 +4796,8 @@ public class Launcher extends Activity
         if (((item.restoreStatus & LauncherAppWidgetInfo.FLAG_PROVIDER_NOT_READY) == 0) &&
                 ((item.restoreStatus & LauncherAppWidgetInfo.FLAG_ID_NOT_VALID) != 0)) {
 
-            appWidgetInfo = mModel.findAppWidgetProviderInfoWithComponent(this, item.providerName);
+            appWidgetInfo = LauncherModel.findAppWidgetProviderInfoWithComponent(this,
+                    item.providerName);
             if (appWidgetInfo == null) {
                 if (DEBUG_WIDGETS) {
                     Log.d(TAG, "Removing restored widget: id=" + item.appWidgetId
@@ -5493,16 +5412,10 @@ public class Launcher extends Activity
     }
 
     private void showFirstRunClings() {
-        // The two first run cling paths are mutually exclusive, if the launcher is preinstalled
-        // on the device, then we always show the first run cling experience (or if there is no
-        // launcher2). Otherwise, we prompt the user upon started for migration
+        // always show the first run cling experience
         LauncherClings launcherClings = new LauncherClings(this);
         if (launcherClings.shouldShowFirstRunOrMigrationClings()) {
-            if (mModel.canMigrateFromOldLauncherDb(this)) {
-                launcherClings.showMigrationCling();
-            } else {
-                launcherClings.showLongPressCling(true);
-            }
+            launcherClings.showLongPressCling(true);
         }
     }
 
@@ -5748,5 +5661,4 @@ interface LauncherTransitionable {
 
 interface DebugIntents {
     static final String DELETE_DATABASE  = "com.android.launcher3.action.DELETE_DATABASE";
-    static final String MIGRATE_DATABASE = "com.android.launcher3.action.MIGRATE_DATABASE";
 }

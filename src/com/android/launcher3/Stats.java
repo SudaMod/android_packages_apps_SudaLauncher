@@ -29,8 +29,6 @@ public class Stats {
     private static final boolean DEBUG_BROADCASTS = false;
     private static final String TAG = "Launcher3/Stats";
 
-    private static final boolean LOCAL_LAUNCH_LOG = false;
-
     public static final String ACTION_LAUNCH = "com.android.launcher3.action.LAUNCH";
     public static final String PERM_LAUNCH = "com.android.launcher3.permission.RECEIVE_LAUNCH_BROADCASTS";
     public static final String EXTRA_INTENT = "intent";
@@ -63,18 +61,13 @@ public class Stats {
 
         loadStats();
 
-        if (LOCAL_LAUNCH_LOG) {
-            try {
-                mLog = new DataOutputStream(mLauncher.openFileOutput(LOG_FILE_NAME, Context.MODE_APPEND));
-                mLog.writeInt(LOG_TAG_VERSION);
-                mLog.writeInt(LOG_VERSION);
-            } catch (FileNotFoundException e) {
-                Log.e(TAG, "unable to create stats log: " + e);
-                mLog = null;
-            } catch (IOException e) {
-                Log.e(TAG, "unable to write to stats log: " + e);
-                mLog = null;
-            }
+        try {
+            mLog = new DataOutputStream(mLauncher.openFileOutput(LOG_FILE_NAME, Context.MODE_APPEND));
+            mLog.writeInt(LOG_TAG_VERSION);
+            mLog.writeInt(LOG_VERSION);
+        } catch (IOException e) {
+            Log.e(TAG, "unable to create / write stats log: " + e);
+            mLog = null;
         }
 
         if (DEBUG_BROADCASTS) {
@@ -142,7 +135,7 @@ public class Stats {
             saveStats();
         }
 
-        if (LOCAL_LAUNCH_LOG && mLog != null) {
+        if (mLog != null) {
             try {
                 mLog.writeInt(LOG_TAG_LAUNCH);
                 mLog.writeLong(System.currentTimeMillis());
@@ -196,8 +189,8 @@ public class Stats {
     }
 
     private void loadStats() {
-        mIntents = new ArrayList<String>(INITIAL_STATS_SIZE);
-        mHistogram = new ArrayList<Integer>(INITIAL_STATS_SIZE);
+        mIntents = new ArrayList<>(INITIAL_STATS_SIZE);
+        mHistogram = new ArrayList<>(INITIAL_STATS_SIZE);
         DataInputStream stats = null;
         try {
             stats = new DataInputStream(mLauncher.openFileInput(STATS_FILE_NAME));
@@ -211,8 +204,6 @@ public class Stats {
                     mHistogram.add(count);
                 }
             }
-        } catch (FileNotFoundException e) {
-            // not a problem
         } catch (IOException e) {
             // more of a problem
 
