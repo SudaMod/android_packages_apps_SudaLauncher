@@ -1690,6 +1690,17 @@ public class Launcher extends Activity
         });
         settingsButton.setOnTouchListener(getHapticFeedbackTouchListener());
 
+        final View defaultPageButton = mOverviewPanel.findViewById(R.id.default_screen_button);
+        defaultPageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!getWorkspace().isSwitchingState()) {
+                    getWorkspace().onClickDefaultScreenButton();
+                }
+            }
+        });
+        defaultPageButton.setOnTouchListener(getHapticFeedbackTouchListener());
+
         // Setup the workspace
         mWorkspace.setHapticFeedbackEnabled(false);
         mWorkspace.setOnLongClickListener(this);
