@@ -39,6 +39,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.AccelerateInterpolator;
 
+import com.android.launcher3.AppsCustomizePagedView;
 import com.android.launcher3.Launcher;
 import com.android.launcher3.R;
 import com.android.launcher3.settings.SettingsProvider;
@@ -68,6 +69,9 @@ public class LauncherPreferenceFragment extends PreferenceFragment implements Pr
     // Global
     private ListPreference mScreenOrientation;
     private SwitchPreference mStatusBarVisibility;
+
+    // Drawer
+    private ListPreference mSortMode;
 
     public LauncherPreferenceFragment() { }
 
@@ -170,10 +174,9 @@ public class LauncherPreferenceFragment extends PreferenceFragment implements Pr
         mStatusBarVisibility.setOnPreferenceChangeListener(this);
 
         // Drawer
-        final ListPreference sortMode =
-                (ListPreference) findPreference(SettingsProvider.SETTINGS_UI_DRAWER_SORT_MODE);
-        sortMode.setSummary(sortMode.getEntry());
-        sortMode.setOnPreferenceChangeListener(this);
+        mSortMode = (ListPreference) findPreference(SettingsProvider.SETTINGS_UI_DRAWER_SORT_MODE);
+        mSortMode.setSummary(mSortMode.getEntry());
+        mSortMode.setOnPreferenceChangeListener(this);
     }
 
     @Override
@@ -212,6 +215,9 @@ public class LauncherPreferenceFragment extends PreferenceFragment implements Pr
             if (mScreenOrientation == preference) {
                 mLauncher.loadOrientation();
                 mLauncher.unlockScreenOrientation(750);
+            } else if (mSortMode == preference) {
+                mLauncher.getAppsCustomizeContent()
+                        .setSortMode(AppsCustomizePagedView.SortMode.getModeForValue(index));
             }
             return true;
         } else if (mStatusBarVisibility == preference) {
