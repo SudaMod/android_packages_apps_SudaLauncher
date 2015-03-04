@@ -58,6 +58,8 @@ public final class SettingsProvider {
     public static int getIntCustomDefault(Context context, String key, int def) {
         try {
             return Integer.parseInt(get(context).getString(key, String.valueOf(def)));
+        } catch (ClassCastException cce) {
+            return get(context).getInt(key, def);
         } catch (NumberFormatException nfe) {
             return def;
         }
@@ -96,7 +98,7 @@ public final class SettingsProvider {
     }
 
     public static void putInt(Context context, String key, int value) {
-        get(context).edit().putInt(key, value).commit();
+        get(context).edit().putString(key, Integer.toString(value)).commit();
     }
 
     public static void putBoolean(Context context, String key, boolean value) {
