@@ -97,7 +97,7 @@ public abstract class PagedView extends ViewGroup implements ViewGroup.OnHierarc
     // We are disabling touch interaction of the widget region for factory ROM.
     private static final boolean DISABLE_TOUCH_INTERACTION = false;
     private static final boolean DISABLE_TOUCH_SIDE_PAGES = true;
-    private static final boolean DISABLE_FLING_TO_DELETE = true;
+    private static final boolean DISABLE_FLING_TO_DELETE = false;
 
     public static final int INVALID_RESTORE_PAGE = -1001;
 
