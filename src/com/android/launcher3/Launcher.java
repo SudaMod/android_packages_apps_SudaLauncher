@@ -316,6 +316,7 @@ public class Launcher extends Activity
 
     protected LauncherModel mModel;
     private IconCache mIconCache;
+    private boolean mScreenWasOff = true;
     private boolean mUserPresent = true;
     private boolean mVisible = false;
     private boolean mHasFocus = false;
@@ -1148,6 +1149,15 @@ public class Launcher extends Activity
         if (f instanceof GestureFragment) {
             ((GestureFragment) f).setGestureDone();
         }
+        if (!mScreenWasOff) {
+            f = getFragmentManager().findFragmentByTag(LauncherPreferenceFragment.TAG);
+            if (f instanceof LauncherPreferenceFragment) {
+                ((LauncherPreferenceFragment) f).remove(getFragmentManager());
+            }
+        } else {
+            // screen is now on and we are ready to handle home press events
+            mScreenWasOff = false;
+        }
         f = getFragmentManager().findFragmentByTag(
                 HiddenFolderFragment.HIDDEN_FOLDER_FRAGMENT);
         if (f != null && !mHiddenFolderAuth) {
@@ -1943,6 +1953,7 @@ public class Launcher extends Activity
         public void onReceive(Context context, Intent intent) {
             final String action = intent.getAction();
             if (Intent.ACTION_SCREEN_OFF.equals(action)) {
+                mScreenWasOff = true;
                 mUserPresent = false;
                 mDragLayer.clearAllResizeFrames();
                 updateRunning();
