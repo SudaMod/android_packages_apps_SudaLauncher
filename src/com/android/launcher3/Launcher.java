@@ -98,6 +98,7 @@ import android.widget.Advanceable;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
+import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -1740,6 +1741,31 @@ public class Launcher extends Activity
             boolean show = shouldShowWeightWatcher();
             mWeightWatcher.setVisibility(show ? View.VISIBLE : View.GONE);
         }
+
+        final FrameLayout appsCustomizeTopBar =
+                (FrameLayout) mAppsCustomizeTabHost.findViewById(R.id.apps_top_bar);
+
+        final SearchView filterApps =
+                (SearchView) appsCustomizeTopBar.findViewById(R.id.apps_filter);
+        filterApps.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String searchString) {
+                mAppsCustomizeContent.filter(searchString);
+                return true;
+            }
+        });
+        filterApps.setOnCloseListener(new SearchView.OnCloseListener() {
+            @Override
+            public boolean onClose() {
+                mAppsCustomizeContent.filter(null);
+                return false;
+            }
+        });
     }
 
     /**
@@ -3701,12 +3727,18 @@ public class Launcher extends Activity
                 mStateAnimation.play(itemsAlpha);
             }
 
+            View topBar = toView.findViewById(R.id.apps_top_bar);
+            topBar.setAlpha(0.01f);
+            ObjectAnimator topBarAlpha =
+                    LauncherAnimUtils.ofFloat(topBar, "alpha", 1f);
+            topBarAlpha.setDuration(revealDuration);
+
             View pageIndicators = toView.findViewById(R.id.apps_customize_page_indicator);
             pageIndicators.setAlpha(0.01f);
             ObjectAnimator indicatorsAlpha =
                     ObjectAnimator.ofFloat(pageIndicators, "alpha", 1f);
             indicatorsAlpha.setDuration(revealDuration);
-            mStateAnimation.play(indicatorsAlpha);
+            mStateAnimation.play(indicatorsAlpha).with(topBarAlpha);
 
             final View allApps = getAllAppsButton();
             int allAppsButtonSize = LauncherAppState.getInstance().
@@ -3941,13 +3973,20 @@ public class Launcher extends Activity
                     mStateAnimation.play(itemsAlpha);
                 }
 
+                View topBar = fromView.findViewById(R.id.apps_top_bar);
+                topBar.setAlpha(1f);
+                ObjectAnimator topBarAlpha =
+                        LauncherAnimUtils.ofFloat(topBar, "alpha", 0f);
+                topBarAlpha.setDuration(revealDuration);
+                topBarAlpha.setInterpolator(new DecelerateInterpolator(1.5f));
+
                 View pageIndicators = fromView.findViewById(R.id.apps_customize_page_indicator);
                 pageIndicators.setAlpha(1f);
                 ObjectAnimator indicatorsAlpha =
                         LauncherAnimUtils.ofFloat(pageIndicators, "alpha", 0f);
                 indicatorsAlpha.setDuration(revealDuration);
                 indicatorsAlpha.setInterpolator(new DecelerateInterpolator(1.5f));
-                mStateAnimation.play(indicatorsAlpha);
+                mStateAnimation.play(indicatorsAlpha).with(topBarAlpha);
 
                 width = revealView.getMeasuredWidth();
 

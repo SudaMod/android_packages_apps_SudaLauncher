@@ -15,7 +15,7 @@
 -->
 <com.android.launcher3.AppsCustomizeTabHost
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:launcher="http://schemas.android.com/apk/res-auto/com.android.launcher3"
+    xmlns:launcher="http://schemas.android.com/apk/res-auto"
     android:clipChildren="false">
 
     <LinearLayout
@@ -24,7 +24,11 @@
         android:layout_height="match_parent"
         android:clipChildren="false"
         android:orientation="vertical">
-
+        <include
+            android:id="@+id/apps_top_bar"
+            layout="@layout/apps_top_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
