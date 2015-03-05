@@ -2178,11 +2178,6 @@ public class Launcher extends Activity
                 imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
             }
 
-            // Reset the apps customize page
-            if (!alreadyOnHome && mAppsCustomizeTabHost != null) {
-                mAppsCustomizeTabHost.reset();
-            }
-
             onHomeIntent();
         }
 
