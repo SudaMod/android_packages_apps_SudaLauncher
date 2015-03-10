@@ -45,7 +45,7 @@
   <string name="landscape_reverse">横向逆转</string>
   <string name="hide_status_bar_title">隐藏状态栏</string>
   <string name="hide_icon_labels">隐藏图标标签</string>
-  <string name="hide_icon_labels_drawer_summary">移除应用手提图标标签</string>
+  <string name="hide_icon_labels_drawer_summary">移除应用抽屉图标标签</string>
   <string name="hide_icon_labels_home_summary">移除主屏幕图标标签</string>
   <string name="show_search_bar">显示搜索栏</string>
   <string name="show_search_bar_summary">当安装Google Now时,将在主屏显示搜索栏</string>
