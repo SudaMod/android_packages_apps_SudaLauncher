@@ -5745,6 +5745,8 @@ public class Launcher extends Activity
         mModel.stopLoader(); //make sure the loader isn't running
         mModel.startLoader(true, page);
         mWorkspace.updateCustomContentVisibility();
+
+        mAppDrawerAdapter.reset();
     }
 
     public void updateStuffIfNeeded() {
