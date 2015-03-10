@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-     Copyright (C) 2015 The NamelessRom Project
+     Copyright (C) 2015 The SudaMod Project
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -15,10 +15,8 @@
      limitations under the License.
 -->
 <resources>
-    <string name="gesture_swipe_down_left">@string/left</string>
-    <string name="gesture_swipe_down_middle">@string/middle</string>
-    <string name="gesture_swipe_down_right">@string/right</string>
-    <string name="gesture_swipe_up_left">@string/left</string>
-    <string name="gesture_swipe_up_middle">@string/middle</string>
-    <string name="gesture_swipe_up_right">@string/right</string>
+    <!-- Application name -->
+    <string name="sm_application_name" translatable="false">SudaLauncher</string>
+    <!-- App version -->
+    <string name="sm_application_version" translatable="false">1.0.2</string>
 </resources>
