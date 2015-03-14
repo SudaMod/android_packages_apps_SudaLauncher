@@ -18,13 +18,11 @@
 <resources>
   <string name="gesture_settings">Hareketler</string>
   <string name="gesture_choose">Ne yapmak istediğinizi seçin</string>
-  <string name="gesture_double_tap">Çift dokunma</string>
-  <string name="gesture_long_press">Uzun basma</string>
   <string name="gesture_swipe_down">Aşağı kaydır</string>
   <string name="gesture_swipe_up">Yukarı kaydır</string>
+  <string name="gesture_double_tap">Çift dokunma</string>
   <string name="gesture_nothing">Hiçbir şey</string>
   <string name="gesture_turn_screen_off">Ekranı Kapat</string>
-  <string name="gesture_expand_status_bar">Durum Çubuğunu Genişlet</string>
   <string name="gesture_toggle_torch">El fenerini aç/kapat</string>
   <string name="gesture_toggle_silent_mode">Sessiz moduna geç</string>
   <string name="gesture_music_play_pause">Oynat/Duraklat müzik</string>
@@ -38,6 +36,4 @@
   <string name="landscape">Manzara</string>
   <string name="landscape_reverse">Ters manzara</string>
   <string name="hide_status_bar_title">Durum çubuğunu gizle</string>
-  <string name="hide">Gizlen</string>
-  <string name="show">Göster</string>
 </resources>

@@ -18,10 +18,13 @@
 <resources>
   <string name="gesture_settings">Жесты</string>
   <string name="gesture_choose">Выбрать действие</string>
-  <string name="gesture_double_tap">Двойное нажатие</string>
-  <string name="gesture_long_press">Долгое нажатие</string>
   <string name="gesture_swipe_down">Свайп вниз</string>
   <string name="gesture_swipe_up">Свайп вверх</string>
+  <string name="gesture_special">Особые</string>
+  <string name="left">По левой стороне</string>
+  <string name="middle">Посередине</string>
+  <string name="right">По правой стороне</string>
+  <string name="gesture_double_tap">Двойное нажатие</string>
   <string name="gesture_nothing">Ничего</string>
   <string name="gesture_turn_screen_off">Выключить экран</string>
   <string name="gesture_expand_status_bar">Разверните строку состояния</string>
@@ -30,6 +33,7 @@
   <string name="gesture_music_play_pause">Воспроизведение/пауза музыки</string>
   <string name="gesture_music_previous">Предыдущий трек</string>
   <string name="gesture_music_next">Следующий трек</string>
+  <string name="gesture_toggle_last_app">Переключ на последнее приложение</string>
   <string name="global_settings">Глобальные параметры</string>
   <string name="screen_orientation">Ориентация экрана</string>
   <string name="automatic">Автоматический</string>
@@ -38,6 +42,5 @@
   <string name="landscape">Горизонтальная ориентация</string>
   <string name="landscape_reverse">Альбомная ориентация (вверх ногами)</string>
   <string name="hide_status_bar_title">Скрыть строку состояния</string>
-  <string name="hide">Скрыть</string>
-  <string name="show">Показать</string>
+  <string name="no_last_app">Последнее приложение не найдено!</string>
 </resources>

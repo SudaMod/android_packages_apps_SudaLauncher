@@ -18,10 +18,13 @@
 <resources>
   <string name="gesture_settings">Gebaren</string>
   <string name="gesture_choose">Kies uit te voeren actie</string>
-  <string name="gesture_double_tap">Dubbel tikken</string>
-  <string name="gesture_long_press">Lang aanraken</string>
   <string name="gesture_swipe_down">Omlaag vegen</string>
   <string name="gesture_swipe_up">Omhoog vegen</string>
+  <string name="gesture_special">Speciaal</string>
+  <string name="left">Links</string>
+  <string name="middle">Midden</string>
+  <string name="right">Rechts</string>
+  <string name="gesture_double_tap">Dubbel tikken</string>
   <string name="gesture_nothing">Niets</string>
   <string name="gesture_turn_screen_off">Scherm uitschakelen</string>
   <string name="gesture_expand_status_bar">Statusbalk uitvouwen</string>
@@ -30,6 +33,7 @@
   <string name="gesture_music_play_pause">Muziek afspelen/pauzeren</string>
   <string name="gesture_music_previous">Vorig nummer</string>
   <string name="gesture_music_next">Volgend nummer</string>
+  <string name="gesture_toggle_last_app">Laatste app kiezen</string>
   <string name="global_settings">GLOBALE INSTELLINGEN</string>
   <string name="screen_orientation">Schermoriëntatie</string>
   <string name="automatic">Automatisch</string>
@@ -38,6 +42,5 @@
   <string name="landscape">Landschap</string>
   <string name="landscape_reverse">Landschap omgekeerd</string>
   <string name="hide_status_bar_title">Verberg statusbalk</string>
-  <string name="hide">Verberg</string>
-  <string name="show">Toon</string>
+  <string name="no_last_app">Geen laatste app gevonden!</string>
 </resources>

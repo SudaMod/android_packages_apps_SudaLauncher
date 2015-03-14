@@ -18,10 +18,13 @@
 <resources>
   <string name="gesture_settings">Gesten</string>
   <string name="gesture_choose">Aktion auswählen</string>
-  <string name="gesture_double_tap">Doppeltes Tippen</string>
-  <string name="gesture_long_press">Langes Drücken</string>
   <string name="gesture_swipe_down">Nach unten streichen</string>
   <string name="gesture_swipe_up">Nach oben streichen</string>
+  <string name="gesture_special">Speziell</string>
+  <string name="left">Links</string>
+  <string name="middle">Mitte</string>
+  <string name="right">Rechts</string>
+  <string name="gesture_double_tap">Doppeltes Tippen</string>
   <string name="gesture_nothing">Nichts</string>
   <string name="gesture_turn_screen_off">Bildschirm ausschalten</string>
   <string name="gesture_expand_status_bar">Erweitern der Statusleiste</string>
@@ -30,6 +33,7 @@
   <string name="gesture_music_play_pause">Medien: Play/Pause</string>
   <string name="gesture_music_previous">Medien: Vorheriger Titel</string>
   <string name="gesture_music_next">Medien: Nächster Titel</string>
+  <string name="gesture_toggle_last_app">Vorherige App</string>
   <string name="global_settings">GLOBALE EINSTELLUNGEN</string>
   <string name="screen_orientation">Bildschirmausrichtung</string>
   <string name="automatic">Automatisch</string>
@@ -38,6 +42,5 @@
   <string name="landscape">Querformat</string>
   <string name="landscape_reverse">Querformat (umgekehrt)</string>
   <string name="hide_status_bar_title">Statusleiste verstecken</string>
-  <string name="hide">Ausblenden</string>
-  <string name="show">Zeigen</string>
+  <string name="no_last_app">Keine vorherige App gefunden!</string>
 </resources>

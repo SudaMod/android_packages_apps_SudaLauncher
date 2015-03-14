@@ -18,13 +18,11 @@
 <resources>
   <string name="gesture_settings">Gestos</string>
   <string name="gesture_choose">Escolha a ação</string>
-  <string name="gesture_double_tap">Duplo toque</string>
-  <string name="gesture_long_press">Toque Prolongado</string>
   <string name="gesture_swipe_down">Deslizar para baixo</string>
   <string name="gesture_swipe_up">Deslizar para cima</string>
+  <string name="gesture_double_tap">Duplo toque</string>
   <string name="gesture_nothing">Nenhum</string>
   <string name="gesture_turn_screen_off">Desligar o ecrã</string>
-  <string name="gesture_expand_status_bar">Expandir a barra de estado</string>
   <string name="gesture_toggle_torch">Ativar/desativar lanterna</string>
   <string name="gesture_toggle_silent_mode">Alternar o modo silencioso</string>
   <string name="gesture_music_play_pause">reproduzir/pausar a música</string>
@@ -38,6 +36,4 @@
   <string name="landscape">Paisagem</string>
   <string name="landscape_reverse">Paisagem invertida</string>
   <string name="hide_status_bar_title">Ocultar barra de estado</string>
-  <string name="hide">Ocultar</string>
-  <string name="show">Mostrar</string>
 </resources>

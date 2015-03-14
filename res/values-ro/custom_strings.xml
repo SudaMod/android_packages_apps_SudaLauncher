@@ -18,13 +18,11 @@
 <resources>
   <string name="gesture_settings">Gesturi</string>
   <string name="gesture_choose">Alege acțiunea</string>
-  <string name="gesture_double_tap">Atingere dubla</string>
-  <string name="gesture_long_press">Atingere lunga</string>
   <string name="gesture_swipe_down">Glisați în jos</string>
   <string name="gesture_swipe_up">Glisați în sus</string>
+  <string name="gesture_double_tap">Atingere dubla</string>
   <string name="gesture_nothing">Nimic</string>
   <string name="gesture_turn_screen_off">Oprire ecran</string>
-  <string name="gesture_expand_status_bar">Extindeţi bara de stare</string>
   <string name="gesture_toggle_torch">Comutare lanternă</string>
   <string name="gesture_toggle_silent_mode">Comutare mod silenţios</string>
   <string name="gesture_music_play_pause">Redare/Pauză muzică</string>
@@ -38,6 +36,4 @@
   <string name="landscape">Peisaj</string>
   <string name="landscape_reverse">Peisaj inversat</string>
   <string name="hide_status_bar_title">Ascundere bară de stare</string>
-  <string name="hide">Ascunde</string>
-  <string name="show">Arată</string>
 </resources>

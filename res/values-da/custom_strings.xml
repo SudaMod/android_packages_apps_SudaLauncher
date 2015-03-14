@@ -18,12 +18,10 @@
 <resources>
   <string name="gesture_settings">Fagter</string>
   <string name="gesture_choose">Vælg handling</string>
-  <string name="gesture_double_tap">Dobbelt tryk</string>
-  <string name="gesture_long_press">Langt tryk</string>
   <string name="gesture_swipe_down">Glide ned</string>
+  <string name="gesture_double_tap">Dobbelt tryk</string>
   <string name="gesture_nothing">Intet</string>
   <string name="gesture_turn_screen_off">Sluk skærmen</string>
-  <string name="gesture_expand_status_bar">Udvid statuslinjen</string>
   <string name="gesture_toggle_torch">Tænd/sluk lommelygte</string>
   <string name="gesture_toggle_silent_mode">Toggle lydløs tilstand</string>
   <string name="gesture_music_play_pause">Afspil/Pause musik</string>
@@ -37,6 +35,4 @@
   <string name="landscape">Landskab</string>
   <string name="landscape_reverse">Landskab vendt</string>
   <string name="hide_status_bar_title">Skjul statuslinjen</string>
-  <string name="hide">Gem</string>
-  <string name="show">Vis</string>
 </resources>
