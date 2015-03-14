@@ -22,10 +22,11 @@
   <string name="gesture_choose">选择操作</string>
   <string name="gesture_long_press">长按</string>
   <string name="gesture_swipe_down">向下滑动</string>
-  <string name="gesture_special">特殊选项</string>
+  <string name="gesture_swipe_up">向上滑动</string>
+  <string name="gesture_special">特殊</string>
   <string name="left">左</string>
   <string name="middle">中</string>
-  <string name="right">右</string>  
+  <string name="right">右</string>
   <string name="gesture_double_tap">双击</string>
   <string name="gesture_nothing">无</string>
   <string name="gesture_turn_screen_off">关闭屏幕</string>
@@ -35,7 +36,7 @@
   <string name="gesture_music_play_pause">播放/暂停音乐</string>
   <string name="gesture_music_previous">上一首歌曲</string>
   <string name="gesture_music_next">下一首歌曲</string>
-  <string name="gesture_toggle_last_app">打开最后的应用程序</string>  
+  <string name="gesture_toggle_last_app">切换最后应用</string>
   <string name="global_settings">全局设置</string>
   <string name="screen_orientation">屏幕方向​​​​​​​​​​​​​​</string>
   <string name="automatic">自动</string>
@@ -54,5 +55,5 @@
   <string name="scroll_effect_home_summary">配置主屏滑动特效</string>
   <string name="grid_size_summary">配置主屏网格大小</string>
   <string name="protected_app_summary">配置受保护应用</string>
-  <string name="no_last_app">没有发现最后运行的应用!</string>
+  <string name="no_last_app">没有发现最后打开的应用程序 ！</string>
 </resources>

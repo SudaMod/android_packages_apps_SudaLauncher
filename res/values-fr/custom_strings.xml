@@ -18,10 +18,13 @@
 <resources>
   <string name="gesture_settings">Gestes</string>
   <string name="gesture_choose">Choisir une action</string>
-  <string name="gesture_double_tap">Appui double</string>
-  <string name="gesture_long_press">Appui long</string>
   <string name="gesture_swipe_down">Glisser en bas</string>
   <string name="gesture_swipe_up">Glisser en haut</string>
+  <string name="gesture_special">Spécial</string>
+  <string name="left">Gauche</string>
+  <string name="middle">Centre</string>
+  <string name="right">Droite</string>
+  <string name="gesture_double_tap">Appui double</string>
   <string name="gesture_nothing">Aucun</string>
   <string name="gesture_turn_screen_off">Éteindre l\'écran</string>
   <string name="gesture_expand_status_bar">Étendre la barre d\'état</string>
@@ -30,6 +33,7 @@
   <string name="gesture_music_play_pause">Lecture/Pause de la musique</string>
   <string name="gesture_music_previous">Piste précédente</string>
   <string name="gesture_music_next">Piste suivante</string>
+  <string name="gesture_toggle_last_app">Ouvrir la dernière application</string>
   <string name="global_settings">PARAMÈTRES GÉNÉRAUX</string>
   <string name="screen_orientation">Orientation de l\'écran</string>
   <string name="automatic">Automatique</string>
@@ -38,6 +42,5 @@
   <string name="landscape">Paysage</string>
   <string name="landscape_reverse">Paysage inversé</string>
   <string name="hide_status_bar_title">Masquer la barre d\'état</string>
-  <string name="hide">Masquer</string>
-  <string name="show">Afficher</string>
+  <string name="no_last_app">Aucune dernière application trouvée!</string>
 </resources>

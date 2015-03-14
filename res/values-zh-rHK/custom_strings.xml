@@ -16,20 +16,24 @@
      limitations under the License.
 -->
 <resources>
-  <string name="gesture_settings">手勢</string>
+  <string name="gesture_settings">手勢設定</string>
   <string name="gesture_choose">選擇動作</string>
-  <string name="gesture_double_tap">雙擊</string>
-  <string name="gesture_long_press">長按</string>
   <string name="gesture_swipe_down">往下拉</string>
   <string name="gesture_swipe_up">往上拉</string>
+  <string name="gesture_special">特別</string>
+  <string name="left">左</string>
+  <string name="middle">中間</string>
+  <string name="right">右</string>
+  <string name="gesture_double_tap">雙擊</string>
   <string name="gesture_nothing">無</string>
   <string name="gesture_turn_screen_off">關閉螢幕</string>
-  <string name="gesture_expand_status_bar">擴展狀態列</string>
+  <string name="gesture_expand_status_bar">打開通知欄</string>
   <string name="gesture_toggle_torch">開關手電筒</string>
   <string name="gesture_toggle_silent_mode">切換靜音模式</string>
   <string name="gesture_music_play_pause">播放/暫停音樂</string>
   <string name="gesture_music_previous">上一首</string>
   <string name="gesture_music_next">下一首</string>
+  <string name="gesture_toggle_last_app">切換最後應用程式</string>
   <string name="global_settings">全域設定</string>
   <string name="screen_orientation">螢幕方向</string>
   <string name="automatic">自動</string>
@@ -38,6 +42,5 @@
   <string name="landscape">橫向</string>
   <string name="landscape_reverse">逆轉橫向</string>
   <string name="hide_status_bar_title">隱藏狀態列</string>
-  <string name="hide">隱藏</string>
-  <string name="show">顯示</string>
+  <string name="no_last_app">沒有發現最後一個應用程式 ！</string>
 </resources>
