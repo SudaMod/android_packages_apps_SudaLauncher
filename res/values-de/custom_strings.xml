@@ -17,6 +17,7 @@
 -->
 <resources>
   <string name="gesture_settings">Gesten</string>
+  <string name="gesture_summary">Verschiedene Aktionen für Gesten definieren</string>
   <string name="gesture_choose">Aktion auswählen</string>
   <string name="gesture_swipe_down">Nach unten streichen</string>
   <string name="gesture_swipe_up">Nach oben streichen</string>
@@ -42,5 +43,15 @@
   <string name="landscape">Querformat</string>
   <string name="landscape_reverse">Querformat (umgekehrt)</string>
   <string name="hide_status_bar_title">Statusleiste verstecken</string>
+  <string name="hide_icon_labels">Verstecke Icon-Beschriftungen</string>
+  <string name="hide_icon_labels_drawer_summary">Entfernt die Icon-Beschriftungen von der App-Übersicht</string>
+  <string name="hide_icon_labels_home_summary">Entfernt die Icon-Beschriftungen von dem Startbildschirm</string>
+  <string name="show_search_bar">Suchleiste anzeigen</string>
+  <string name="show_search_bar_summary">Zeigt die Suchleiste auf dem Startbildschirm wenn Google Now installiert ist</string>
+  <string name="scrolling_wallpaper_summary">Scroll den Hintergrund zusammen mit dem Startbildschirm</string>
+  <string name="scroll_effect_drawer_summary">Konfigurieren Sie den Übergangseffekt zwischen Seiten der App-Übersicht</string>
+  <string name="scroll_effect_home_summary">Konfigurieren Sie den Übergangseffekt zwischen den Startbildschirmen</string>
+  <string name="grid_size_summary">Konfigurieren Sie die Rastergröße des Startbildschirms</string>
+  <string name="protected_app_summary">Konfigurieren von geschützten Apps</string>
   <string name="no_last_app">Keine vorherige App gefunden!</string>
 </resources>
