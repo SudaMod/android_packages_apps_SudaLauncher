@@ -17,6 +17,7 @@
 -->
 <resources>
   <string name="gesture_settings">手势操作</string>
+  <string name="gesture_summary">定义手势操作</string>
   <string name="gesture_choose">选择操作</string>
   <string name="gesture_swipe_down">向下滑动</string>
   <string name="gesture_swipe_up">向上滑动</string>
@@ -42,5 +43,15 @@
   <string name="landscape">横向</string>
   <string name="landscape_reverse">横向逆转</string>
   <string name="hide_status_bar_title">隐藏状态栏</string>
+  <string name="hide_icon_labels">隐藏图标标签</string>
+  <string name="hide_icon_labels_drawer_summary">在启动器抽屉中移除应用程序的图标</string>
+  <string name="hide_icon_labels_home_summary">在主屏幕上删除应用应用程序图标</string>
+  <string name="show_search_bar">显示搜索栏</string>
+  <string name="show_search_bar_summary">如果已安装Google Now则在主屏幕上显示搜索栏</string>
+  <string name="scrolling_wallpaper_summary">切换主屏幕时连带壁纸一起滚动</string>
+  <string name="scroll_effect_drawer_summary">更改滑动应用抽屉特效</string>
+  <string name="scroll_effect_home_summary">更改滑动主屏幕特效</string>
+  <string name="grid_size_summary">更改主屏幕网格大小</string>
+  <string name="protected_app_summary">配置受保护的应用程序</string>
   <string name="no_last_app">没有发现最后打开的应用程序 ！</string>
 </resources>

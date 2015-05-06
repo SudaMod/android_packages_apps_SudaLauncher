@@ -17,17 +17,24 @@
 -->
 <resources>
   <string name="gesture_settings">Gestos</string>
+  <string name="gesture_summary">Definir diferentes ações para gestos</string>
   <string name="gesture_choose">Selecionar ação</string>
   <string name="gesture_swipe_down">Deslizar para baixo</string>
   <string name="gesture_swipe_up">Deslizar para cima</string>
+  <string name="gesture_special">Especial</string>
+  <string name="left">Esquerda</string>
+  <string name="middle">Meio</string>
+  <string name="right">Direita</string>
   <string name="gesture_double_tap">Toque duplo</string>
   <string name="gesture_nothing">Nada</string>
   <string name="gesture_turn_screen_off">Desligar a tela</string>
+  <string name="gesture_expand_status_bar">Expandir a barra de estado</string>
   <string name="gesture_toggle_torch">Lig/Desl. lanterna</string>
   <string name="gesture_toggle_silent_mode">Lig/Desl. modo silencioso</string>
   <string name="gesture_music_play_pause">Reproduzir/Pausar música</string>
   <string name="gesture_music_previous">Música anterior</string>
   <string name="gesture_music_next">Próxima música</string>
+  <string name="gesture_toggle_last_app">Alternar a última aplicação</string>
   <string name="global_settings">CONFIGURAÇÕES GLOBAIS</string>
   <string name="screen_orientation">Orientação da tela</string>
   <string name="automatic">Automático</string>
@@ -36,4 +43,15 @@
   <string name="landscape">Paisagem</string>
   <string name="landscape_reverse">Paisagem invertida</string>
   <string name="hide_status_bar_title">Ocultar barra de estado</string>
+  <string name="hide_icon_labels">Ocultar etiquetas dos ícones</string>
+  <string name="hide_icon_labels_drawer_summary">Remove as etiquetas dos ícones das aplicações na gaveta de aplicações</string>
+  <string name="hide_icon_labels_home_summary">Remove as etiquetas dos ícones das aplicações do ecrã inicial</string>
+  <string name="show_search_bar">Mostrar barra de pesquisa</string>
+  <string name="show_search_bar_summary">Mostra a barra de pesquisa no ecrã inicial se o Google Now estiver instalado</string>
+  <string name="scrolling_wallpaper_summary">Percorre o papel de parede juntamente com os ecrãs de ínicio</string>
+  <string name="scroll_effect_drawer_summary">Configurar o efeito quando percorre a gaveta de aplicações</string>
+  <string name="scroll_effect_home_summary">Configurar o efeito quando percorre o ecrã inicial</string>
+  <string name="grid_size_summary">Configurar o tamanho da grelha do ecrã inicial</string>
+  <string name="protected_app_summary">Configurar aplicações protegidas</string>
+  <string name="no_last_app">Nenhuma aplicação encontrada!</string>
 </resources>

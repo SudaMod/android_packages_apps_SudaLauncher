@@ -17,6 +17,7 @@
 -->
 <resources>
   <string name="gesture_settings">Gebaren</string>
+  <string name="gesture_summary">Definieër verschillende acties voor gebaren</string>
   <string name="gesture_choose">Kies uit te voeren actie</string>
   <string name="gesture_swipe_down">Omlaag vegen</string>
   <string name="gesture_swipe_up">Omhoog vegen</string>
@@ -42,5 +43,15 @@
   <string name="landscape">Landschap</string>
   <string name="landscape_reverse">Landschap omgekeerd</string>
   <string name="hide_status_bar_title">Verberg statusbalk</string>
+  <string name="hide_icon_labels">Verberg icoon labels</string>
+  <string name="hide_icon_labels_drawer_summary">Verwijdert de labels van apps in het app overzicht</string>
+  <string name="hide_icon_labels_home_summary">Verwijdert de labels van apps in het startscherm</string>
+  <string name="show_search_bar">Toon zoekbalk</string>
+  <string name="show_search_bar_summary">Toont de search bar op het startscherm indien Google Now geïnstalleerd is</string>
+  <string name="scrolling_wallpaper_summary">Scrollt de wallpaper mee met de startschermen</string>
+  <string name="scroll_effect_drawer_summary">Verander scrolleffect app overzicht</string>
+  <string name="scroll_effect_home_summary">Verander scrolleffect startschermen</string>
+  <string name="grid_size_summary">Stel de rastergrootte van het startscherm in</string>
+  <string name="protected_app_summary">Configureer beveiligde apps</string>
   <string name="no_last_app">Geen laatste app gevonden!</string>
 </resources>
