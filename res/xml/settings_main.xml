@@ -74,6 +74,12 @@
             android:summary="@string/hide_icon_labels_drawer_summary"
             android:defaultValue="false" />
 
+        <SwitchPreference
+            android:key="drawer_hide_top_bar"
+            android:title="@string/hide_apps_top_bar"
+            android:summary="@string/hide_apps_top_bar_summary"
+            android:defaultValue="false" />
+
         <Preference
             android:key="scroll_effect_drawer"
             android:title="@string/scroll_effect_text"

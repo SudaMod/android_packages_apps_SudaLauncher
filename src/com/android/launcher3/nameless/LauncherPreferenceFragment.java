@@ -72,6 +72,7 @@ public class LauncherPreferenceFragment extends PreferenceFragment implements Pr
 
     // Drawer
     private ListPreference mSortMode;
+    private SwitchPreference mHideTopBar;
 
     public LauncherPreferenceFragment() { }
 
@@ -177,6 +178,10 @@ public class LauncherPreferenceFragment extends PreferenceFragment implements Pr
         mSortMode = (ListPreference) findPreference(SettingsProvider.SETTINGS_UI_DRAWER_SORT_MODE);
         mSortMode.setSummary(mSortMode.getEntry());
         mSortMode.setOnPreferenceChangeListener(this);
+
+        mHideTopBar =
+                (SwitchPreference) findPreference(SettingsProvider.SETTINGS_UI_DRAWER_HIDE_TOP_BAR);
+        mHideTopBar.setOnPreferenceChangeListener(this);
     }
 
     @Override
@@ -195,7 +200,7 @@ public class LauncherPreferenceFragment extends PreferenceFragment implements Pr
             mLauncher.onClickGestureButton();
         } else if (KEY_GRID_SIZE.equals(key)) {
             mLauncher.onClickDynamicGridSizeButton();
-        }  else if (KEY_SCROLL_EFFECT_DRAWER.equals(key)) {
+        } else if (KEY_SCROLL_EFFECT_DRAWER.equals(key)) {
             mLauncher.onClickTransitionEffectButton(true);
         } else if (KEY_SCROLL_EFFECT_HOME.equals(key)) {
             mLauncher.onClickTransitionEffectButton(false);
@@ -224,6 +229,11 @@ public class LauncherPreferenceFragment extends PreferenceFragment implements Pr
             final boolean value = (Boolean) newValue;
             SettingsProvider.putBoolean(getActivity(), mStatusBarVisibility.getKey(), value);
             mLauncher.updateStatusBarVisibility();
+            return true;
+        } else if (mHideTopBar == preference) {
+            final boolean hide = (Boolean) newValue;
+            SettingsProvider.putBoolean(getActivity(), mHideTopBar.getKey(), hide);
+            mLauncher.setAppsCustomizeTopBarVisible(!hide);
             return true;
         }
         return false;
