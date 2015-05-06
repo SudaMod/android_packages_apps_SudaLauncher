@@ -66,6 +66,8 @@ public class LauncherPreferenceFragment extends PreferenceFragment implements Pr
 
     private View mRootView;
 
+    private Animator mRevealAnimator;
+
     // Global
     private ListPreference mScreenOrientation;
     private SwitchPreference mStatusBarVisibility;
@@ -129,15 +131,19 @@ public class LauncherPreferenceFragment extends PreferenceFragment implements Pr
 
     public void remove(final FragmentManager fragmentManager) {
         if (mRootView != null) {
+            if (mRevealAnimator != null && mRevealAnimator.isRunning()) {
+                return;
+            }
+
             final int[] metrics = getMetrics();
             final int x = metrics[0];
             final int y = metrics[1];
 
             final int r = (int) Math.hypot(x, y);
-            final Animator reveal = ViewAnimationUtils.createCircularReveal(mRootView, x, y, r, 0);
-            reveal.setInterpolator(new AccelerateInterpolator(2f));
-            reveal.setDuration(DURATION_REVEAL_ANIMATION);
-            reveal.addListener(new Animator.AnimatorListener() {
+            mRevealAnimator = ViewAnimationUtils.createCircularReveal(mRootView, x, y, r, 0);
+            mRevealAnimator.setInterpolator(new AccelerateInterpolator(2f));
+            mRevealAnimator.setDuration(DURATION_REVEAL_ANIMATION);
+            mRevealAnimator.addListener(new Animator.AnimatorListener() {
                 @Override public void onAnimationStart(Animator animation) { }
 
                 @Override public void onAnimationEnd(Animator animation) {
@@ -153,7 +159,7 @@ public class LauncherPreferenceFragment extends PreferenceFragment implements Pr
 
                 @Override public void onAnimationRepeat(Animator animation) { }
             });
-            reveal.start();
+            mRevealAnimator.start();
         } else {
             fragmentManager.beginTransaction().remove(this).commit();
         }
