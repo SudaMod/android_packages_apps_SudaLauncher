@@ -1757,7 +1757,6 @@ public class Launcher extends Activity
 
         mAppsCustomizeTopBar = (FrameLayout) mAppsCustomizeTabHost.findViewById(R.id.apps_top_bar);
 
-        appsCustomizeTopBar.setVisibility(View.GONE); 
         final SearchView filterApps =
                 (SearchView) mAppsCustomizeTopBar.findViewById(R.id.apps_filter);
         filterApps.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
