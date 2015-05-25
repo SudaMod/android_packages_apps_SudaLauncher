@@ -43,6 +43,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.ApplicationInfo;
@@ -104,6 +105,7 @@ import android.widget.Toast;
 
 import com.android.launcher3.DropTarget.DragObject;
 import com.android.launcher3.PagedView.PageSwitchListener;
+import com.android.launcher3.PagedView.TransitionEffect;
 import com.android.launcher3.compat.AppWidgetManagerCompat;
 import com.android.launcher3.compat.LauncherActivityInfoCompat;
 import com.android.launcher3.compat.LauncherAppsCompat;
@@ -111,7 +113,6 @@ import com.android.launcher3.compat.PackageInstallerCompat;
 import com.android.launcher3.compat.PackageInstallerCompat.PackageInstallInfo;
 import com.android.launcher3.compat.UserHandleCompat;
 import com.android.launcher3.compat.UserManagerCompat;
-import com.android.launcher3.PagedView.TransitionEffect;
 import com.android.launcher3.nameless.LauncherPreferenceFragment;
 import com.android.launcher3.nameless.gestures.GestureFragment;
 import com.android.launcher3.settings.SettingsProvider;
@@ -286,6 +287,7 @@ public class Launcher extends Activity
 
     private Hotseat mHotseat;
     private ViewGroup mOverviewPanel;
+    private FrameLayout mAppsCustomizeTopBar;
 
     private View mAllAppsButton;
 
@@ -1753,12 +1755,11 @@ public class Launcher extends Activity
             mWeightWatcher.setVisibility(show ? View.VISIBLE : View.GONE);
         }
 
-        final FrameLayout appsCustomizeTopBar =
-                (FrameLayout) mAppsCustomizeTabHost.findViewById(R.id.apps_top_bar);
+        mAppsCustomizeTopBar = (FrameLayout) mAppsCustomizeTabHost.findViewById(R.id.apps_top_bar);
 
         appsCustomizeTopBar.setVisibility(View.GONE); 
         final SearchView filterApps =
-                (SearchView) appsCustomizeTopBar.findViewById(R.id.apps_filter);
+                (SearchView) mAppsCustomizeTopBar.findViewById(R.id.apps_filter);
         filterApps.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String s) {
@@ -1778,6 +1779,17 @@ public class Launcher extends Activity
                 return false;
             }
         });
+
+        boolean hideAppsCustomizeTopBar = SettingsProvider.getBooleanCustomDefault(this,
+                SettingsProvider.SETTINGS_UI_DRAWER_HIDE_TOP_BAR, false);
+        setAppsCustomizeTopBarVisible(!hideAppsCustomizeTopBar);
+    }
+
+    public void setAppsCustomizeTopBarVisible(boolean visible) {
+        if (mAppsCustomizeTopBar == null) {
+            return;
+        }
+        mAppsCustomizeTopBar.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
     /**
@@ -2615,6 +2627,30 @@ public class Launcher extends Activity
                     appWidgetInfo);
             mWorkspace.removeExtraEmptyScreenDelayed(true, onComplete, delay, false);
         }
+    }
+
+    /**
+     * This is used when starting widget config activities. Make sure to setWaitingForResult so that
+     * the ItemInfo for the pending item is properly saved.
+     *
+     * @param intent
+     * @param requestCode
+     * @param fillInIntent
+     * @param flagsMask
+     * @param flagsValues
+     * @param extraFlags
+     * @param options
+     * @throws IntentSender.SendIntentException
+     */
+    @Override
+    public void startIntentSenderForResult(IntentSender intent, int requestCode,
+        Intent fillInIntent, int flagsMask, int flagsValues, int extraFlags, Bundle options)
+            throws IntentSender.SendIntentException {
+        if (requestCode >= 0) {
+            setWaitingForResult(true);
+        }
+        super.startIntentSenderForResult(intent, requestCode, fillInIntent, flagsMask, flagsValues,
+                extraFlags, options);
     }
 
     protected void moveToCustomContentScreen(boolean animate) {

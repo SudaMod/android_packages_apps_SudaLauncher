@@ -28,6 +28,7 @@ public final class SettingsProvider {
     // Drawer
     public static final String SETTINGS_UI_DRAWER_SORT_MODE = "drawer_sort_mode";
     public static final String SETTINGS_UI_DRAWER_HIDE_ICON_LABELS = "drawer_hide_icon_labels";
+    public static final String SETTINGS_UI_DRAWER_HIDE_TOP_BAR = "drawer_hide_top_bar";
 
     // Home screen
     public static final String SETTINGS_UI_HOMESCREEN_SEARCH = "homescreen_search";

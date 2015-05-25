@@ -63,4 +63,7 @@
     <string name="protected_app_summary">Configure protected apps</string>
 
     <string name="no_last_app">No last app found!</string>
+
+    <string name="hide_apps_top_bar">Hide top bar</string>
+    <string name="hide_apps_top_bar_summary">The top bar contains items like a search view</string>
 </resources>
