@@ -96,13 +96,13 @@ public class DeviceProfile {
         }
     }
 
+    public float numRows;
+    public float numColumns;
+    public int numRowsBase;
+    public int numColumnsBase;
     String name;
     float minWidthDps;
     float minHeightDps;
-    float numRows;
-    float numColumns;
-    int numRowsBase;
-    int numColumnsBase;
     float numHotseatIcons;
     float iconSize;
     private float iconTextSize;

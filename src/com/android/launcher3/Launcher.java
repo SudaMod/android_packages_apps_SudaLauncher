@@ -113,8 +113,8 @@ import com.android.launcher3.compat.PackageInstallerCompat;
 import com.android.launcher3.compat.PackageInstallerCompat.PackageInstallInfo;
 import com.android.launcher3.compat.UserHandleCompat;
 import com.android.launcher3.compat.UserManagerCompat;
-import com.android.launcher3.nameless.LauncherPreferenceFragment;
-import com.android.launcher3.nameless.gestures.GestureFragment;
+import com.android.launcher3.nameless.LauncherConfiguration;
+import com.android.launcher3.nameless.LauncherPreferenceActivity;
 import com.android.launcher3.settings.SettingsProvider;
 
 import java.io.DataInputStream;
@@ -307,8 +307,6 @@ public class Launcher extends Activity
 
     private boolean mWorkspaceLoading = true;
 
-    private boolean mDynamicGridUpdateRequired = false;
-
     private boolean mPaused = true;
     private boolean mRestoring;
     private boolean mWaitingForResult;
@@ -319,7 +317,6 @@ public class Launcher extends Activity
 
     protected LauncherModel mModel;
     private IconCache mIconCache;
-    private boolean mScreenWasOff = true;
     private boolean mUserPresent = true;
     private boolean mVisible = false;
     private boolean mHasFocus = false;
@@ -1138,30 +1135,6 @@ public class Launcher extends Activity
 
         //Close out Fragments
         Fragment f = getFragmentManager().findFragmentByTag(
-                TransitionEffectsFragment.TRANSITION_EFFECTS_FRAGMENT);
-        if (f instanceof TransitionEffectsFragment) {
-            ((TransitionEffectsFragment) f).setEffect();
-        }
-        f = getFragmentManager().findFragmentByTag(
-                DynamicGridSizeFragment.DYNAMIC_GRID_SIZE_FRAGMENT);
-        if (f instanceof DynamicGridSizeFragment) {
-            ((DynamicGridSizeFragment) f).setSize();
-            mWorkspace.hideOutlines();
-        }
-        f = getFragmentManager().findFragmentByTag(GestureFragment.TAG);
-        if (f instanceof GestureFragment) {
-            ((GestureFragment) f).setGestureDone();
-        }
-        if (!mScreenWasOff) {
-            f = getFragmentManager().findFragmentByTag(LauncherPreferenceFragment.TAG);
-            if (f instanceof LauncherPreferenceFragment) {
-                ((LauncherPreferenceFragment) f).remove(getFragmentManager());
-            }
-        } else {
-            // screen is now on and we are ready to handle home press events
-            mScreenWasOff = false;
-        }
-        f = getFragmentManager().findFragmentByTag(
                 HiddenFolderFragment.HIDDEN_FOLDER_FRAGMENT);
         if (f != null && !mHiddenFolderAuth) {
             mHiddenFolderFragment.saveHiddenFolderStatus(-1);
@@ -1172,7 +1145,7 @@ public class Launcher extends Activity
             mHiddenFolderAuth = false;
         }
 
-        updateGridIfNeeded();
+        updateStuffIfNeeded();
     }
 
     @Override
@@ -1290,160 +1263,6 @@ public class Launcher extends Activity
         popupMenu.show();
     }
 
-    public void onClickDynamicGridSizeButton() {
-        FragmentManager fragmentManager = getFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-
-        final DynamicGridSizeFragment dynamicGridSizeFragment = new DynamicGridSizeFragment();
-        fragmentTransaction.replace(R.id.launcher, dynamicGridSizeFragment,
-                DynamicGridSizeFragment.DYNAMIC_GRID_SIZE_FRAGMENT);
-        fragmentTransaction.commit();
-    }
-
-    public void setDynamicGridSize(DeviceProfile.GridSize size) {
-        int gridSize = SettingsProvider.getIntCustomDefault(this,
-                SettingsProvider.SETTINGS_UI_DYNAMIC_GRID_SIZE, 0);
-        boolean customValuesChanged = false;
-        if (gridSize == size.getValue() && size == DeviceProfile.GridSize.Custom) {
-            int tempRows = SettingsProvider.getIntCustomDefault(this,
-                    SettingsProvider.SETTINGS_UI_HOMESCREEN_ROWS, (int)mGrid.numRows);
-            int tempColumns = SettingsProvider.getIntCustomDefault(this,
-                    SettingsProvider.SETTINGS_UI_HOMESCREEN_COLUMNS, (int)mGrid.numColumns);
-            if (tempColumns != (int) mGrid.numColumns || tempRows != (int) mGrid.numRows) {
-                customValuesChanged = true;
-            }
-        }
-
-        if (gridSize != size.getValue() || customValuesChanged) {
-            SettingsProvider.putString(this, SettingsProvider.SETTINGS_UI_DYNAMIC_GRID_SIZE,
-                    String.valueOf(size.getValue()));
-
-            setUpdateDynamicGrid();
-        }
-
-        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-        Configuration config = getResources().getConfiguration();
-        if (config.getLayoutDirection() == View.LAYOUT_DIRECTION_RTL) {
-            fragmentTransaction.setCustomAnimations(0, R.anim.exit_out_left);
-        } else {
-            fragmentTransaction.setCustomAnimations(0, R.anim.exit_out_right);
-        }
-        final Fragment f = getFragmentManager()
-                .findFragmentByTag(DynamicGridSizeFragment.DYNAMIC_GRID_SIZE_FRAGMENT);
-        fragmentTransaction.remove(f).commit();
-    }
-
-    public void onClickTransitionEffectButton(final boolean isDrawer) {
-        Bundle bundle = new Bundle();
-        bundle.putBoolean(TransitionEffectsFragment.PAGE_OR_DRAWER_SCROLL_SELECT, isDrawer);
-        FragmentManager fragmentManager = getFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-
-        final TransitionEffectsFragment transitionEffectsFragment = new TransitionEffectsFragment();
-        transitionEffectsFragment.setArguments(bundle);
-        fragmentTransaction.setCustomAnimations(0, 0);
-        fragmentTransaction.replace(R.id.launcher, transitionEffectsFragment,
-                TransitionEffectsFragment.TRANSITION_EFFECTS_FRAGMENT);
-        fragmentTransaction.commit();
-    }
-
-    public void setTransitionEffect(boolean pageOrDrawer, String newTransitionEffect) {
-        String mSettingsProviderValue = pageOrDrawer ?
-                SettingsProvider.SETTINGS_UI_DRAWER_SCROLLING_TRANSITION_EFFECT
-                : SettingsProvider.SETTINGS_UI_HOMESCREEN_SCROLLING_TRANSITION_EFFECT;
-        PagedView pagedView = pageOrDrawer ? mAppsCustomizeContent : mWorkspace;
-
-        SettingsProvider
-                .putString(getApplicationContext(), mSettingsProviderValue, newTransitionEffect);
-        TransitionEffect.setFromString(pagedView, newTransitionEffect);
-
-        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-        Configuration config = getResources().getConfiguration();
-        if (config.getLayoutDirection() == View.LAYOUT_DIRECTION_RTL) {
-            fragmentTransaction.setCustomAnimations(0, R.anim.exit_out_left);
-        } else {
-            fragmentTransaction.setCustomAnimations(0, R.anim.exit_out_right);
-        }
-        final Fragment f = getFragmentManager()
-                .findFragmentByTag(TransitionEffectsFragment.TRANSITION_EFFECTS_FRAGMENT);
-        fragmentTransaction.remove(f).commit();
-    }
-
-    public void onClickGestureButton() {
-        final FragmentManager fragmentManager = getFragmentManager();
-        final FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-
-        final GestureFragment gestureFragment = new GestureFragment();
-        fragmentTransaction.setCustomAnimations(0, 0);
-        fragmentTransaction.replace(R.id.launcher, gestureFragment, GestureFragment.TAG);
-        fragmentTransaction.commit();
-    }
-
-    public void setGestureDone() {
-        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-        Configuration config = getResources().getConfiguration();
-        if(config.getLayoutDirection() == View.LAYOUT_DIRECTION_RTL) {
-            fragmentTransaction.setCustomAnimations(0, R.anim.exit_out_left);
-        } else {
-            fragmentTransaction.setCustomAnimations(0, R.anim.exit_out_right);
-        }
-        final Fragment f = getFragmentManager().findFragmentByTag(GestureFragment.TAG);
-        fragmentTransaction.remove(f).commit();
-    }
-
-    public void onClickTransitionEffectOverflowMenuButton(View v, final boolean drawer) {
-        final PopupMenu popupMenu = new PopupMenu(this, v);
-
-        final Menu menu = popupMenu.getMenu();
-        popupMenu.inflate(R.menu.scrolling_settings);
-        MenuItem pageOutlines = menu.findItem(R.id.scrolling_page_outlines);
-        MenuItem fadeAdjacent = menu.findItem(R.id.scrolling_fade_adjacent);
-
-        pageOutlines.setVisible(!drawer);
-        pageOutlines.setChecked(SettingsProvider.getBoolean(this,
-                SettingsProvider.SETTINGS_UI_HOMESCREEN_SCROLLING_PAGE_OUTLINES,
-                R.bool.preferences_interface_homescreen_scrolling_page_outlines_default
-        ));
-
-        fadeAdjacent.setChecked(SettingsProvider.getBoolean(this,
-                !drawer ?
-                        SettingsProvider.SETTINGS_UI_HOMESCREEN_SCROLLING_FADE_ADJACENT :
-                        SettingsProvider.SETTINGS_UI_DRAWER_SCROLLING_FADE_ADJACENT,
-                !drawer ?
-                        R.bool.preferences_interface_homescreen_scrolling_fade_adjacent_default :
-                        R.bool.preferences_interface_drawer_scrolling_fade_adjacent_default
-        ));
-
-        final PagedView pagedView = !drawer ? mWorkspace : mAppsCustomizeContent;
-
-        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.scrolling_page_outlines:
-                        SettingsProvider.putBoolean(Launcher.this,
-                                SettingsProvider.SETTINGS_UI_HOMESCREEN_SCROLLING_PAGE_OUTLINES,
-                                !item.isChecked());
-                        mWorkspace.setShowOutlines(!item.isChecked());
-                        break;
-                    case R.id.scrolling_fade_adjacent:
-                        SettingsProvider.putBoolean(Launcher.this, !drawer ?
-                                        SettingsProvider.SETTINGS_UI_HOMESCREEN_SCROLLING_FADE_ADJACENT :
-                                        SettingsProvider.SETTINGS_UI_DRAWER_SCROLLING_FADE_ADJACENT,
-                                !item.isChecked());
-                        pagedView.setFadeInAdjacentScreens(!item.isChecked());
-                        break;
-                    default:
-                        return false;
-                }
-
-                return true;
-            }
-        });
-
-        popupMenu.show();
-    }
-
     protected void startManageApps() {
         Intent manageApps;
         manageApps = new Intent(ACTION_MANAGE_APPS);
@@ -1463,10 +1282,10 @@ public class Launcher extends Activity
     }
 
     protected void startLauncherSettings() {
-        getFragmentManager().beginTransaction()
-                .replace(R.id.container_preferences,LauncherPreferenceFragment.newInstance(this),
-                        LauncherPreferenceFragment.TAG)
-                .commit();
+        Intent i = new Intent(this, LauncherPreferenceActivity.class);
+        i.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        startActivity(i);
+
         if (mWorkspace.isInOverviewMode()) {
             mWorkspace.exitOverviewMode(false);
         }
@@ -1779,6 +1598,10 @@ public class Launcher extends Activity
             }
         });
 
+        setAppsCustomizeTopBarVisible();
+    }
+
+    private void setAppsCustomizeTopBarVisible() {
         boolean hideAppsCustomizeTopBar = SettingsProvider.getBooleanCustomDefault(this,
                 SettingsProvider.SETTINGS_UI_DRAWER_HIDE_TOP_BAR, false);
         setAppsCustomizeTopBarVisible(!hideAppsCustomizeTopBar);
@@ -2013,7 +1836,6 @@ public class Launcher extends Activity
         public void onReceive(Context context, Intent intent) {
             final String action = intent.getAction();
             if (Intent.ACTION_SCREEN_OFF.equals(action)) {
-                mScreenWasOff = true;
                 mUserPresent = false;
                 mDragLayer.clearAllResizeFrames();
                 updateRunning();
@@ -2821,24 +2643,6 @@ public class Launcher extends Activity
             FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
             fragmentTransaction
                     .remove(mHiddenFolderFragment).commit();
-        }
-
-        f1 = getFragmentManager().findFragmentByTag(
-                TransitionEffectsFragment.TRANSITION_EFFECTS_FRAGMENT);
-        Fragment f2 = getFragmentManager().findFragmentByTag(
-                DynamicGridSizeFragment.DYNAMIC_GRID_SIZE_FRAGMENT);
-        Fragment f3 = getFragmentManager().findFragmentByTag(GestureFragment.TAG);
-        if (f1 instanceof TransitionEffectsFragment) {
-            ((TransitionEffectsFragment) f1).setEffect();
-        } else if (f2 instanceof DynamicGridSizeFragment) {
-            ((DynamicGridSizeFragment) f2).setSize();
-        } else if (f3 instanceof GestureFragment) {
-            ((GestureFragment) f3).setGestureDone();
-        } else {
-            f1 = getFragmentManager().findFragmentByTag(LauncherPreferenceFragment.TAG);
-            if (f1 instanceof LauncherPreferenceFragment) {
-                ((LauncherPreferenceFragment) f1).remove(getFragmentManager());
-            }
         }
 
         if (isAllAppsVisible()) {
@@ -5728,17 +5532,71 @@ public class Launcher extends Activity
         mModel.stopLoader(); //make sure the loader isn't running
         mModel.startLoader(true, page);
         mWorkspace.updateCustomContentVisibility();
-
     }
 
-    public void setUpdateDynamicGrid() {
-        mDynamicGridUpdateRequired = true;
+    public void updateStuffIfNeeded() {
+        updateGridIfNeeded();
+        updateSortModeIfNeeded();
+        updateDrawerTopBarIfNeeded();
+        updateAppsFadeInAdjacentScreensIfNeeded();
+        updateAppsTransitionIfNeeded();
+        updateWorkspaceIfNeeded();
     }
 
     public boolean updateGridIfNeeded() {
-        if (mDynamicGridUpdateRequired) {
-            updateDynamicGrid(mWorkspace.getCurrentPage());
-            mDynamicGridUpdateRequired = false;
+        if (LauncherConfiguration.updateDynamicGrid) {
+            updateDynamicGrid();
+            LauncherConfiguration.updateDynamicGrid = false;
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean updateSortModeIfNeeded() {
+        if (LauncherConfiguration.updateSortMode) {
+            mAppsCustomizeContent.updateSortModeFromPreferences();
+            LauncherConfiguration.updateSortMode = false;
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean updateDrawerTopBarIfNeeded() {
+        if (LauncherConfiguration.updateDrawerTopBar) {
+            setAppsCustomizeTopBarVisible();
+            LauncherConfiguration.updateDrawerTopBar = false;
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean updateAppsFadeInAdjacentScreensIfNeeded() {
+        if (LauncherConfiguration.updateAppsFadeInAdjacentScreens) {
+            mAppsCustomizeContent.updateFadeAdjacentFromPreferences();
+            LauncherConfiguration.updateAppsFadeInAdjacentScreens = false;
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean updateAppsTransitionIfNeeded() {
+        if (LauncherConfiguration.updateAppsTransition) {
+            mAppsCustomizeContent.setTransitionEffect();
+            LauncherConfiguration.updateAppsTransition = false;
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean updateWorkspaceIfNeeded() {
+        if (LauncherConfiguration.updateWorkspace) {
+            mWorkspace.reloadSettings();
+            LauncherConfiguration.updateWorkspace = false;
             return true;
         }
 

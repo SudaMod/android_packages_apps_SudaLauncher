@@ -15,6 +15,7 @@
      limitations under the License.
 -->
 <resources>
+    <string name="preferences_text">Preferences</string>
     <!-- Gestures -->
     <string name="gesture_settings">Gestures</string>
     <string name="gesture_summary">Define different actions for gestures</string>

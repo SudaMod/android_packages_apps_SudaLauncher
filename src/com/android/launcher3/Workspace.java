@@ -5333,7 +5333,7 @@ public class Workspace extends SmoothPagedView
         }
     }
 
-    private void reloadSettings() {
+    public void reloadSettings() {
         mShowSearchBar = SettingsProvider.getBoolean(mLauncher, SettingsProvider.SETTINGS_UI_HOMESCREEN_SEARCH,
                 R.bool.preferences_interface_homescreen_search_default);
         mShowOutlines = SettingsProvider.getBoolean(mLauncher,

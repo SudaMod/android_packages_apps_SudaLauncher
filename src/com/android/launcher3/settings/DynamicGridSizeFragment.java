@@ -14,40 +14,36 @@
  * limitations under the License.
  */
 
-package com.android.launcher3;
+package com.android.launcher3.settings;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.ObjectAnimator;
+import android.app.Activity;
 import android.app.Dialog;
-import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.util.AttributeSet;
-import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.NumberPicker;
 import android.widget.TextView;
 
-import com.android.launcher3.settings.SettingsProvider;
+import com.android.launcher3.DeviceProfile;
+import com.android.launcher3.LauncherAppState;
+import com.android.launcher3.R;
+import com.android.launcher3.nameless.LauncherConfiguration;
+import com.android.launcher3.nameless.SlidingFragment;
 
-public class DynamicGridSizeFragment extends Fragment
+public class DynamicGridSizeFragment extends SlidingFragment
         implements NumberPicker.OnValueChangeListener, Dialog.OnDismissListener {
     public static final String DYNAMIC_GRID_SIZE_FRAGMENT = "DynamicGridSizeFragment";
 
@@ -83,34 +79,24 @@ public class DynamicGridSizeFragment extends Fragment
 
             mAdapter.notifyDataSetInvalidated();
             updateGridMetrics();
+
+            SettingsProvider.putInt(getActivity(),
+                    SettingsProvider.SETTINGS_UI_DYNAMIC_GRID_SIZE, mCurrentSize.getValue());
+
+            LauncherConfiguration.updateDynamicGrid = true;
         }
     };
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                Bundle savedInstanceState) {
+            Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.dynamic_grid_size_screen, container, false);
         mDynamicGrid = (GridSizeView) v.findViewById(R.id.dynamic_grid_size_image);
         mListView = (ListView) v.findViewById(R.id.dynamic_grid_list);
 
-        Launcher launcher = (Launcher) getActivity();
-        LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams)
-                mListView.getLayoutParams();
-        lp.bottomMargin = ((FrameLayout.LayoutParams) launcher.getOverviewPanel()
-                .findViewById(R.id.settings_container).getLayoutParams()).bottomMargin;
-        mListView.setLayoutParams(lp);
-
-        LinearLayout titleLayout = (LinearLayout) v.findViewById(R.id.dynamic_grid_title);
-        titleLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setSize();
-            }
-        });
-
         mCurrentSize = DeviceProfile.GridSize.getModeForValue(
                 SettingsProvider.getIntCustomDefault(getActivity(),
-                SettingsProvider.SETTINGS_UI_DYNAMIC_GRID_SIZE, 0));
+                        SettingsProvider.SETTINGS_UI_DYNAMIC_GRID_SIZE, 0));
 
         DeviceProfile grid = getGrid();
         mCustomGridRows = (int) grid.numRows;
@@ -118,22 +104,14 @@ public class DynamicGridSizeFragment extends Fragment
 
         updateGridMetrics();
 
-        Resources res = getResources();
         int[] valueResIds = {
-            R.string.grid_size_comfortable,
-            R.string.grid_size_cozy,
-            R.string.grid_size_condensed,
-            R.string.grid_size_custom
+                R.string.grid_size_comfortable,
+                R.string.grid_size_cozy,
+                R.string.grid_size_condensed,
+                R.string.grid_size_custom
         };
         mAdapter = new GridSizeAdapter(getActivity(), valueResIds);
         mListView.setAdapter(mAdapter);
-
-        // RTL
-        ImageView navPrev = (ImageView) v.findViewById(R.id.nav_prev);
-        Configuration config = getResources().getConfiguration();
-        if (config.getLayoutDirection() == View.LAYOUT_DIRECTION_RTL) {
-            navPrev.setImageResource(R.drawable.ic_navigation_next);
-        }
 
         return v;
     }
@@ -146,30 +124,6 @@ public class DynamicGridSizeFragment extends Fragment
             mDynamicGrid.setMetrics(grid.numRowsBase + mCurrentSize.getValue(),
                     grid.numColumnsBase + mCurrentSize.getValue());
         }
-    }
-
-    @Override
-    public Animator onCreateAnimator(int transit, boolean enter, int nextAnim) {
-        if (enter) {
-            DisplayMetrics displaymetrics = new DisplayMetrics();
-            getActivity().getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
-            int width = displaymetrics.widthPixels;
-            Configuration config = getResources().getConfiguration();
-            final ObjectAnimator anim;
-            if (config.getLayoutDirection() == View.LAYOUT_DIRECTION_RTL) {
-                anim = ObjectAnimator.ofFloat(this, "translationX", -width, 0);
-            } else {
-                anim = ObjectAnimator.ofFloat(this, "translationX", width, 0);
-            }
-
-            return anim;
-        } else {
-            return super.onCreateAnimator(transit, enter, nextAnim);
-        }
-    }
-
-    public void setSize() {
-        ((Launcher) getActivity()).setDynamicGridSize(mCurrentSize);
     }
 
     private void setSelected(View v) {
@@ -245,9 +199,10 @@ public class DynamicGridSizeFragment extends Fragment
 
     @Override
     public void onDismiss(DialogInterface dialog) {
-        SettingsProvider.putInt(getActivity(),
+        final Activity activity = getActivity();
+        SettingsProvider.putInt(activity,
                 SettingsProvider.SETTINGS_UI_HOMESCREEN_ROWS, mCustomGridRows);
-        SettingsProvider.putInt(getActivity(),
+        SettingsProvider.putInt(activity,
                 SettingsProvider.SETTINGS_UI_HOMESCREEN_COLUMNS, mCustomGridColumns);
 
         mAdapter.notifyDataSetInvalidated();
@@ -282,7 +237,7 @@ public class DynamicGridSizeFragment extends Fragment
         public View getView(int position, View convertView, ViewGroup parent) {
             if (convertView == null) {
                 LayoutInflater inflater = (LayoutInflater)
-                    mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                        mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 convertView = inflater.inflate(R.layout.settings_pane_list_item, parent, false);
             }
 
@@ -304,9 +259,6 @@ public class DynamicGridSizeFragment extends Fragment
             }
 
             if (position == DeviceProfile.GridSize.Custom.getValue()) {
-                LauncherAppState app = LauncherAppState.getInstance();
-                DeviceProfile grid = app.getDynamicGrid().getDeviceProfile();
-
                 int rows = SettingsProvider.getIntCustomDefault(getActivity(),
                         SettingsProvider.SETTINGS_UI_HOMESCREEN_ROWS, getGrid().numRowsBase);
                 int columns = SettingsProvider.getIntCustomDefault(getActivity(),
