@@ -15,7 +15,7 @@
  *    limitations under the License.
  * -->
  */
-package com.android.launcher3.nameless.gestures;
+package org.namelessrom.perception.gestures;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -34,7 +34,7 @@ import android.widget.TextView;
 
 import com.android.launcher3.R;
 import com.android.launcher3.list.PinnedHeaderListAdapter;
-import com.android.launcher3.nameless.actions.ActionProcessor;
+import org.namelessrom.perception.actions.ActionProcessor;
 import com.android.launcher3.settings.SettingsProvider;
 
 public class GestureHeaderAdapter extends PinnedHeaderListAdapter {

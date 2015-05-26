@@ -15,7 +15,7 @@
  *    limitations under the License.
  * -->
  */
-package com.android.launcher3.nameless.gestures;
+package org.namelessrom.perception.gestures;
 
 import android.content.res.Resources;
 import android.database.Cursor;
@@ -27,7 +27,7 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 
 import com.android.launcher3.R;
-import com.android.launcher3.nameless.SlidingFragment;
+import org.namelessrom.perception.SlidingFragment;
 
 public class GestureFragment extends SlidingFragment {
     public static final String TAG = "GESTURE_FRAGMENT";

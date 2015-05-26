@@ -20,8 +20,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.android.launcher3.R;
-import com.android.launcher3.nameless.LauncherConfiguration;
-import com.android.launcher3.nameless.SlidingFragment;
+import org.namelessrom.perception.LauncherConfiguration;
+import org.namelessrom.perception.SlidingFragment;
 
 public class TransitionEffectsFragment extends SlidingFragment
         implements MenuItem.OnMenuItemClickListener {

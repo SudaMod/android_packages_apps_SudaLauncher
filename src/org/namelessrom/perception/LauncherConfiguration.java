@@ -1,4 +1,4 @@
-package com.android.launcher3.nameless;
+package org.namelessrom.perception;
 
 public class LauncherConfiguration {
     public static boolean updateDrawerTopBar;

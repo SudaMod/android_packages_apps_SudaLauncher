@@ -113,8 +113,8 @@ import com.android.launcher3.compat.PackageInstallerCompat;
 import com.android.launcher3.compat.PackageInstallerCompat.PackageInstallInfo;
 import com.android.launcher3.compat.UserHandleCompat;
 import com.android.launcher3.compat.UserManagerCompat;
-import com.android.launcher3.nameless.LauncherConfiguration;
-import com.android.launcher3.nameless.LauncherPreferenceActivity;
+import org.namelessrom.perception.LauncherConfiguration;
+import org.namelessrom.perception.LauncherPreferenceActivity;
 import com.android.launcher3.settings.SettingsProvider;
 
 import java.io.DataInputStream;

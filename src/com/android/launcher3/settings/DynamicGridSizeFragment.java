@@ -40,8 +40,8 @@ import android.widget.TextView;
 import com.android.launcher3.DeviceProfile;
 import com.android.launcher3.LauncherAppState;
 import com.android.launcher3.R;
-import com.android.launcher3.nameless.LauncherConfiguration;
-import com.android.launcher3.nameless.SlidingFragment;
+import org.namelessrom.perception.LauncherConfiguration;
+import org.namelessrom.perception.SlidingFragment;
 
 public class DynamicGridSizeFragment extends SlidingFragment
         implements NumberPicker.OnValueChangeListener, Dialog.OnDismissListener {

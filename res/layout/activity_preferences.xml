@@ -6,7 +6,7 @@
 
     <fragment
         android:id="@+id/fragment_preferences"
-        android:name="com.android.launcher3.nameless.LauncherPreferenceFragment"
+        android:name="org.namelessrom.perception.LauncherPreferenceFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

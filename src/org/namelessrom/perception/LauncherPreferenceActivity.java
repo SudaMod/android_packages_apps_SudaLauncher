@@ -1,4 +1,4 @@
-package com.android.launcher3.nameless;
+package org.namelessrom.perception;
 
 import android.animation.Animator;
 import android.app.ActionBar;
@@ -20,7 +20,7 @@ import android.view.WindowManager;
 import android.view.animation.AccelerateInterpolator;
 
 import com.android.launcher3.R;
-import com.android.launcher3.nameless.gestures.GestureFragment;
+import org.namelessrom.perception.gestures.GestureFragment;
 import com.android.launcher3.settings.DynamicGridSizeFragment;
 import com.android.launcher3.settings.TransitionEffectsFragment;
 

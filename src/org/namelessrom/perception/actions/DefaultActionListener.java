@@ -16,7 +16,7 @@
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * -->
  */
-package com.android.launcher3.nameless.actions;
+package org.namelessrom.perception.actions;
 
 import android.content.Context;
 

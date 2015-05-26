@@ -15,7 +15,7 @@
  *    limitations under the License.
  * -->
  */
-package com.android.launcher3.nameless.gestures;
+package org.namelessrom.perception.gestures;
 
 import android.content.Context;
 import android.graphics.Point;
@@ -25,8 +25,8 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.WindowManager;
 
-import com.android.launcher3.nameless.actions.ActionProcessor;
-import com.android.launcher3.nameless.actions.BaseActionListener;
+import org.namelessrom.perception.actions.ActionProcessor;
+import org.namelessrom.perception.actions.BaseActionListener;
 import com.android.launcher3.settings.SettingsProvider;
 
 public class GestureHelper {

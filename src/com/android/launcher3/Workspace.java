@@ -75,8 +75,8 @@ import com.android.launcher3.LauncherSettings.Favorites;
 import com.android.launcher3.compat.PackageInstallerCompat;
 import com.android.launcher3.compat.PackageInstallerCompat.PackageInstallInfo;
 import com.android.launcher3.compat.UserHandleCompat;
-import com.android.launcher3.nameless.gestures.GestureHelper;
-import com.android.launcher3.nameless.actions.DefaultActionListener;
+import org.namelessrom.perception.gestures.GestureHelper;
+import org.namelessrom.perception.actions.DefaultActionListener;
 import com.android.launcher3.settings.SettingsProvider;
 
 import java.util.ArrayList;

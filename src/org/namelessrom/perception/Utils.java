@@ -15,7 +15,7 @@
  *    limitations under the License.
  * -->
  */
-package com.android.launcher3.nameless;
+package org.namelessrom.perception;
 
 import android.app.ActivityManager;
 import android.app.ActivityManagerNative;

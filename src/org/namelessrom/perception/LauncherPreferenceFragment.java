@@ -15,7 +15,7 @@
  *    limitations under the License.
  * -->
  */
-package com.android.launcher3.nameless;
+package org.namelessrom.perception;
 
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
