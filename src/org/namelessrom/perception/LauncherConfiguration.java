@@ -8,4 +8,6 @@ public class LauncherConfiguration {
     public static boolean updateAppsFadeInAdjacentScreens;
     public static boolean updateAppsTransition;
     public static boolean updateWorkspace;
+
+    public static boolean flushIconCache;
 }

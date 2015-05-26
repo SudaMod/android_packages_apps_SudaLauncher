@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <Preference
+        android:key="icon_pack"
+        android:title="@string/icon_pack_title"
+        android:summary="@string/icon_pack_summary" />
+
     <PreferenceCategory
         android:key="category_global"
         android:title="@string/global_settings">

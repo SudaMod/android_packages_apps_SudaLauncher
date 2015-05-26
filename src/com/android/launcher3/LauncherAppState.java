@@ -95,7 +95,7 @@ public class LauncherAppState implements DeviceProfile.DeviceProfileCallbacks {
         mScreenDensity = sContext.getResources().getDisplayMetrics().density;
 
         recreateWidgetPreviewDb();
-        mIconCache = new IconCache(sContext);
+        mIconCache = IconCache.get(sContext);
 
         mAppFilter = AppFilter.loadByName(sContext.getString(R.string.app_filter_class));
         mBuildInfo = BuildInfo.loadByName(sContext.getString(R.string.build_info_class));

@@ -33,6 +33,8 @@ import android.view.ViewGroup;
 import com.android.launcher3.R;
 import com.android.launcher3.settings.SettingsProvider;
 
+import org.namelessrom.perception.theme.IconPackHelper;
+
 public class LauncherPreferenceFragment extends PreferenceFragment implements Preference.OnPreferenceChangeListener {
     public static final String TAG = "LauncherPrefFragment";
 
@@ -42,6 +44,8 @@ public class LauncherPreferenceFragment extends PreferenceFragment implements Pr
 
     private static final String PREFIX_GENERAL = "general_";
     private static final String PREFIX_HOME_SCREEN = "homescreen_";
+
+    private static final String KEY_ICON_PACK = "icon_pack";
 
     private static final String KEY_GESTURES = "gestures";
     private static final String KEY_GRID_SIZE = "grid_size";
@@ -97,7 +101,9 @@ public class LauncherPreferenceFragment extends PreferenceFragment implements Pr
     @Override
     public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
         final String key = preference.getKey();
-        if (KEY_PROTECTED_APPS.equals(key)) {
+        if (KEY_ICON_PACK.equals(key)) {
+            IconPackHelper.get(getActivity()).pickIconPack(getActivity());
+        } else if (KEY_PROTECTED_APPS.equals(key)) {
             final Intent intent = new Intent();
             intent.setClassName(ANDROID_SETTINGS, ANDROID_PROTECTED_APPS);
             try {

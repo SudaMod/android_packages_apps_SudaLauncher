@@ -115,6 +115,8 @@ import com.android.launcher3.compat.UserHandleCompat;
 import com.android.launcher3.compat.UserManagerCompat;
 import org.namelessrom.perception.LauncherConfiguration;
 import org.namelessrom.perception.LauncherPreferenceActivity;
+import org.namelessrom.perception.theme.IconPackHelper;
+
 import com.android.launcher3.settings.SettingsProvider;
 
 import java.io.DataInputStream;
@@ -554,7 +556,7 @@ public class Launcher extends Activity
 
         mModel = app.setLauncher(this);
         mIconCache = app.getIconCache();
-        mIconCache.flushInvalidIcons(mGrid);
+        mIconCache.flush();
     }
 
     /**
@@ -5547,6 +5549,7 @@ public class Launcher extends Activity
         updateAppsFadeInAdjacentScreensIfNeeded();
         updateAppsTransitionIfNeeded();
         updateWorkspaceIfNeeded();
+        flushIconCacheIfNeeded();
     }
 
     public boolean updateGridIfNeeded() {
@@ -5603,6 +5606,18 @@ public class Launcher extends Activity
         if (LauncherConfiguration.updateWorkspace) {
             mWorkspace.reloadSettings();
             LauncherConfiguration.updateWorkspace = false;
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean flushIconCacheIfNeeded() {
+        if (LauncherConfiguration.flushIconCache) {
+            IconPackHelper.get(this).flushIconPack();
+            mIconCache.reloadIconPack();
+            mModel.forceReload();
+            LauncherConfiguration.flushIconCache = false;
             return true;
         }
 
