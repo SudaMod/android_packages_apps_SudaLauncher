@@ -57,6 +57,6 @@
   <string name="protected_app_summary">配置受保护应用</string>
   <string name="no_last_app">没有发现最后打开的应用程序 ！</string>
   <string name="hide_apps_top_bar">显示搜索栏</string>
-  <string name="hide_apps_top_bar_summary">隐藏顶部搜索栏</string>
+  <string name="hide_apps_top_bar_summary">显示/隐藏顶部搜索栏</string>
 
 </resources>
