@@ -3581,7 +3581,7 @@ public class Launcher extends Activity
             View topBar = toView.findViewById(R.id.apps_top_bar);
             topBar.setAlpha(0.01f);
             ObjectAnimator topBarAlpha =
-                    LauncherAnimUtils.ofFloat(topBar, "alpha", 1f);
+                    ObjectAnimator.ofFloat(topBar, "alpha", 1f);
             topBarAlpha.setDuration(revealDuration);
 
             View pageIndicators = toView.findViewById(R.id.apps_customize_page_indicator);
@@ -3824,7 +3824,7 @@ public class Launcher extends Activity
                     mStateAnimation.play(itemsAlpha);
                 }
 
-                View topBar = fromView.findViewById(R.id.apps_top_bar);
+                final View topBar = fromView.findViewById(R.id.apps_top_bar);
                 topBar.setAlpha(1f);
                 ObjectAnimator topBarAlpha =
                         LauncherAnimUtils.ofFloat(topBar, "alpha", 0f);
@@ -3859,6 +3859,12 @@ public class Launcher extends Activity
                         revealView.setVisibility(View.INVISIBLE);
                         if (!isWidgetTray) {
                             allAppsButton.setVisibility(View.VISIBLE);
+                        }
+                        SearchView filterApps = (SearchView) topBar.findViewById(R.id.apps_filter);
+                        if (filterApps != null) {
+                            filterApps.setQuery("", true);
+                            filterApps.setIconified(true);
+                            filterApps.clearFocus();
                         }
                     }
                 });
