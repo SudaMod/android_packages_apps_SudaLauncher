@@ -82,11 +82,5 @@
         <include layout="@layout/overview_panel"
             android:id="@+id/overview_panel"
             android:visibility="gone" />
-
-        <FrameLayout
-            android:id="@+id/container_preferences"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
     </com.android.launcher3.DragLayer>
 </FrameLayout>

@@ -21,7 +21,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.android.launcher3"
     android:versionName="@string/sm_application_version"
-    android:versionCode="1002">
+    android:versionCode="1003">
 
     <original-package android:name="com.android.launcher3" />
 
@@ -108,6 +108,10 @@
                 <category android:name="android.intent.category.MONKEY"/>
             </intent-filter>
         </activity>
+
+        <activity
+            android:name="org.namelessrom.perception.LauncherPreferenceActivity"
+            android:theme="@style/TranslucentActivity" />
 
         <activity
             android:name="com.android.launcher3.ToggleWeightWatcher"

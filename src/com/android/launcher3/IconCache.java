@@ -39,6 +39,8 @@ import com.android.launcher3.compat.LauncherAppsCompat;
 import com.android.launcher3.compat.UserHandleCompat;
 import com.android.launcher3.compat.UserManagerCompat;
 
+import org.namelessrom.perception.theme.IconPackHelper;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -95,17 +97,17 @@ public class IconCache {
         }
     }
 
-    private final HashMap<UserHandleCompat, Bitmap> mDefaultIcons =
-            new HashMap<UserHandleCompat, Bitmap>();
+    private final HashMap<UserHandleCompat, Bitmap> mDefaultIcons = new HashMap<>();
     private final Context mContext;
     private final PackageManager mPackageManager;
     private final UserManagerCompat mUserManager;
     private final LauncherAppsCompat mLauncherApps;
-    private final HashMap<CacheKey, CacheEntry> mCache =
-            new HashMap<CacheKey, CacheEntry>(INITIAL_ICON_CACHE_CAPACITY);
+    private final HashMap<CacheKey, CacheEntry> mCache = new HashMap<>(INITIAL_ICON_CACHE_CAPACITY);
     private int mIconDpi;
 
-    public IconCache(Context context) {
+    private static IconCache sInstance;
+
+    private IconCache(Context context) {
         ActivityManager activityManager =
                 (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
 
@@ -118,11 +120,32 @@ public class IconCache {
         // need to set mIconDpi before getting default icon
         UserHandleCompat myUser = UserHandleCompat.myUserHandle();
         mDefaultIcons.put(myUser, makeDefaultIcon(myUser));
+
+        reloadIconPack();
+    }
+
+    public static IconCache get(Context context) {
+        if (sInstance == null) {
+            sInstance = new IconCache(context);
+        }
+        return sInstance;
+    }
+
+    public void reloadIconPack() {
+        flush();
+
+        String iconPack = IconPackHelper.get(mContext).getIconPack();
+        if (!TextUtils.isEmpty(iconPack)) {
+            IconPackHelper.get(mContext).loadIconPack(iconPack);
+        } else {
+            if (DEBUG) {
+                Log.d(TAG, "using system icon pack");
+            }
+        }
     }
 
     public Drawable getFullResDefaultActivityIcon() {
-        return getFullResIcon(Resources.getSystem(),
-                android.R.mipmap.sym_def_app_icon);
+        return getFullResIcon(Resources.getSystem(), android.R.mipmap.sym_def_app_icon);
     }
 
     public Drawable getFullResIcon(Resources resources, int iconId) {
@@ -160,16 +183,24 @@ public class IconCache {
     }
 
     public Drawable getFullResIcon(ActivityInfo info) {
-
         Resources resources;
+        int iconId;
+
+        // try to load from icon pack first
+        if (IconPackHelper.get(mContext).isIconPackLoaded()) {
+            iconId = IconPackHelper.get(mContext).getResourceIdForActivityIcon(info);
+            if (iconId != 0) {
+                return getFullResIcon(IconPackHelper.get(mContext).getIconPackResources(), iconId);
+            }
+        }
+
         try {
-            resources = mPackageManager.getResourcesForApplication(
-                    info.applicationInfo);
+            resources = mPackageManager.getResourcesForApplication(info.applicationInfo);
         } catch (PackageManager.NameNotFoundException e) {
             resources = null;
         }
         if (resources != null) {
-            int iconId = info.getIconResource();
+            iconId = info.getIconResource();
             if (iconId != 0) {
                 return getFullResIcon(resources, iconId);
             }
@@ -351,8 +382,9 @@ public class IconCache {
                 }
 
                 entry.contentDescription = mUserManager.getBadgedLabelForUser(entry.title, user);
-                entry.icon = Utilities.createIconBitmap(
-                        info.getBadgedIcon(mIconDpi), mContext, unreadNum);
+                Drawable drawable = getFullResIcon(mPackageManager
+                        .resolveActivity(new Intent().setComponent(componentName), 0));
+                entry.icon = Utilities.createIconBitmap(drawable, mContext, unreadNum);
             } else {
                 entry.title = "";
                 Bitmap preloaded = getPreloadedIcon(componentName, user);

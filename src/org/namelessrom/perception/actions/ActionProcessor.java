@@ -16,7 +16,7 @@
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * -->
  */
-package com.android.launcher3.nameless.actions;
+package org.namelessrom.perception.actions;
 
 import android.app.StatusBarManager;
 import android.content.Context;
@@ -32,8 +32,8 @@ import android.view.KeyEvent;
 
 import com.android.launcher3.LauncherApplication;
 import com.android.launcher3.R;
-import com.android.launcher3.nameless.Utils;
-import com.android.launcher3.nameless.gestures.GestureHelper;
+import org.namelessrom.perception.Utils;
+import org.namelessrom.perception.gestures.GestureHelper;
 import com.android.launcher3.settings.SettingsProvider;
 
 public class ActionProcessor {

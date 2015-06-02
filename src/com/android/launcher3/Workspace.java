@@ -75,8 +75,8 @@ import com.android.launcher3.LauncherSettings.Favorites;
 import com.android.launcher3.compat.PackageInstallerCompat;
 import com.android.launcher3.compat.PackageInstallerCompat.PackageInstallInfo;
 import com.android.launcher3.compat.UserHandleCompat;
-import com.android.launcher3.nameless.gestures.GestureHelper;
-import com.android.launcher3.nameless.actions.DefaultActionListener;
+import org.namelessrom.perception.gestures.GestureHelper;
+import org.namelessrom.perception.actions.DefaultActionListener;
 import com.android.launcher3.settings.SettingsProvider;
 
 import java.util.ArrayList;
@@ -376,7 +376,7 @@ public class Workspace extends SmoothPagedView
         mCameraDistance = res.getInteger(R.integer.config_cameraDistance);
         mOriginalDefaultPage = mDefaultPage = a.getInt(R.styleable.Workspace_defaultScreen, 1);
         mDefaultScreenId = SettingsProvider.getLongCustomDefault(context,
-            SettingsProvider.SETTINGS_UI_HOMESCREEN_DEFAULT_SCREEN_ID, -1);
+            SettingsProvider.SETTINGS_UI_HOMESCREEN_DEFAULT_SCREEN_ID, 1);
         a.recycle();
 
         setOnHierarchyChangeListener(this);
@@ -5333,7 +5333,7 @@ public class Workspace extends SmoothPagedView
         }
     }
 
-    private void reloadSettings() {
+    public void reloadSettings() {
         mShowSearchBar = SettingsProvider.getBoolean(mLauncher, SettingsProvider.SETTINGS_UI_HOMESCREEN_SEARCH,
                 R.bool.preferences_interface_homescreen_search_default);
         mShowOutlines = SettingsProvider.getBoolean(mLauncher,

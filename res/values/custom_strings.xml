@@ -15,6 +15,7 @@
      limitations under the License.
 -->
 <resources>
+    <string name="preferences_text">Preferences</string>
     <!-- Gestures -->
     <string name="gesture_settings">Gestures</string>
     <string name="gesture_summary">Define different actions for gestures</string>
@@ -66,4 +67,11 @@
 
     <string name="hide_apps_top_bar">Hide top bar</string>
     <string name="hide_apps_top_bar_summary">The top bar contains items like a search view</string>
+
+    <!-- Icon pack support -->
+    <string name="icon_pack_title">Icon packs</string>
+    <string name="icon_pack_summary">Icon packs replace the default application icon</string>
+    <string name="no_iconpacks_summary">No icon packs installed</string>
+    <string name="default_icon_pack_title">System icons</string>
+    <string name="dialog_pick_icon_pack_title">Pick icon pack</string>
 </resources>

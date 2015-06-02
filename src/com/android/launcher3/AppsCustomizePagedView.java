@@ -298,9 +298,7 @@ public class AppsCustomizePagedView extends PagedViewWithDraggableItems implemen
         // (top + bottom)
         mFadeInAdjacentScreens = false;
 
-        TransitionEffect.setFromString(this, SettingsProvider.getString(context,
-                SettingsProvider.SETTINGS_UI_DRAWER_SCROLLING_TRANSITION_EFFECT,
-                R.string.preferences_interface_drawer_scrolling_transition_effect));
+        setTransitionEffect();
 
         // Unless otherwise specified this view is important for accessibility.
         if (getImportantForAccessibility() == View.IMPORTANT_FOR_ACCESSIBILITY_AUTO) {
@@ -329,6 +327,12 @@ public class AppsCustomizePagedView extends PagedViewWithDraggableItems implemen
         DeviceProfile grid = app.getDynamicGrid().getDeviceProfile();
         setPadding(grid.edgeMarginPx, 2 * grid.edgeMarginPx,
                 grid.edgeMarginPx, 2 * grid.edgeMarginPx);
+    }
+
+    public void setTransitionEffect() {
+        TransitionEffect.setFromString(this, SettingsProvider.getString(getContext(),
+                SettingsProvider.SETTINGS_UI_DRAWER_SCROLLING_TRANSITION_EFFECT,
+                R.string.preferences_interface_drawer_scrolling_transition_effect));
     }
 
     void setAllAppsPadding(Rect r) {
@@ -1558,10 +1562,22 @@ public class AppsCustomizePagedView extends PagedViewWithDraggableItems implemen
     public void setup(Launcher launcher, DragController dragController) {
         mLauncher = launcher;
         mDragController = dragController;
-        int sortMode = SettingsProvider.getIntCustomDefault(mLauncher, SettingsProvider.SETTINGS_UI_DRAWER_SORT_MODE, -1);
+        updateSortModeFromPreferences();
+        updateFadeAdjacentFromPreferences();
+    }
+
+    public void updateSortModeFromPreferences() {
+        int sortMode = SettingsProvider.getIntCustomDefault(mLauncher,
+                SettingsProvider.SETTINGS_UI_DRAWER_SORT_MODE, -1);
         if (sortMode != -1) {
             setSortMode(SortMode.getModeForValue(sortMode));
         }
+    }
+
+    public void updateFadeAdjacentFromPreferences() {
+        boolean fade = SettingsProvider.getBooleanCustomDefault(mLauncher,
+                SettingsProvider.SETTINGS_UI_DRAWER_SCROLLING_FADE_ADJACENT, false);
+        setFadeInAdjacentScreens(fade);
     }
 
     /**

@@ -15,27 +15,21 @@
  *    limitations under the License.
  * -->
  */
-package com.android.launcher3.nameless.gestures;
+package org.namelessrom.perception.gestures;
 
-import android.animation.Animator;
-import android.animation.ObjectAnimator;
-import android.app.Fragment;
-import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 
-import com.android.launcher3.Launcher;
 import com.android.launcher3.R;
+import org.namelessrom.perception.SlidingFragment;
 
-public class GestureFragment extends Fragment {
+public class GestureFragment extends SlidingFragment {
     public static final String TAG = "GESTURE_FRAGMENT";
 
     private static final int POS_SWIPE_DOWN = 0;
@@ -51,14 +45,6 @@ public class GestureFragment extends Fragment {
 
         final ListView listView = (ListView) v.findViewById(R.id.settings_gestures_list);
         initializeAdapter(listView);
-
-        final LinearLayout titleLayout = (LinearLayout) v.findViewById(R.id.gesture_title);
-        titleLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setGestureDone();
-            }
-        });
 
         return v;
     }
@@ -111,25 +97,6 @@ public class GestureFragment extends Fragment {
     }
 
     @Override
-    public Animator onCreateAnimator(int transit, boolean enter, int nextAnim) {
-        if (enter) {
-            DisplayMetrics displaymetrics = new DisplayMetrics();
-            getActivity().getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
-            int width = displaymetrics.widthPixels;
-            Configuration config = getResources().getConfiguration();
-            final ObjectAnimator anim;
-            if (config.getLayoutDirection() == View.LAYOUT_DIRECTION_RTL) {
-                anim = ObjectAnimator.ofFloat(this, "translationX", -width, 0);
-            } else {
-                anim = ObjectAnimator.ofFloat(this, "translationX", width, 0);
-            }
-
-            return anim;
-        }
-        return super.onCreateAnimator(transit, false, nextAnim);
-    }
-
-    @Override
     public void onPause() {
         super.onPause();
         if (mGestureHeaderAdapter != null) {
@@ -138,7 +105,7 @@ public class GestureFragment extends Fragment {
     }
 
     public void setGestureDone() {
-        ((Launcher) getActivity()).setGestureDone();
+        // Nothing to do
     }
 
 }
