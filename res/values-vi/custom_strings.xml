@@ -16,6 +16,7 @@
      limitations under the License.
 -->
 <resources>
+  <string name="preferences_text">Tùy chỉnh cá nhân</string>
   <string name="gesture_settings">Cử chỉ</string>
   <string name="gesture_choose">Chọn thao tác</string>
   <string name="gesture_swipe_down">Vuốt xuống</string>

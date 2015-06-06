@@ -16,6 +16,7 @@
      limitations under the License.
 -->
 <resources>
+  <string name="preferences_text">偏好設定</string>
   <string name="gesture_settings">手勢設定</string>
   <string name="gesture_choose">選擇動作</string>
   <string name="gesture_swipe_down">下滑</string>

@@ -16,6 +16,7 @@
      limitations under the License.
 -->
 <resources>
+  <string name="preferences_text">Voorkeuren</string>
   <string name="gesture_settings">Gebaren</string>
   <string name="gesture_summary">Definieër verschillende acties voor gebaren</string>
   <string name="gesture_choose">Kies uit te voeren actie</string>
