@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/*
+ * Copyright (C) 2010 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+-->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@*android:id/search_bar"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal">
+
+    <!-- This is actually used for the badge icon *or* the badge label (or neither) -->
+    <TextView
+        android:id="@*android:id/search_badge"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="2dip"
+        android:drawablePadding="0dip"
+        android:gravity="center_vertical"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@color/searchview_text"
+        android:visibility="gone" />
+
+    <ImageView
+        android:id="@*android:id/search_button"
+        style="?android:attr/actionButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="center_vertical"
+        android:contentDescription="@*android:string/searchview_description_search"
+        android:focusable="true" />
+
+    <LinearLayout
+        android:id="@*android:id/search_edit_frame"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginBottom="4dip"
+        android:layout_marginEnd="8dip"
+        android:layout_marginStart="8dip"
+        android:layout_marginTop="4dip"
+        android:layout_weight="1"
+        android:layoutDirection="locale"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@*android:id/search_mag_icon"
+            android:layout_width="@*android:dimen/dropdownitem_icon_width"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="@*android:dimen/dropdownitem_text_padding_left"
+            android:scaleType="centerInside"
+            android:visibility="gone" />
+
+        <!-- Inner layout contains the app icon, button(s) and EditText -->
+        <LinearLayout
+            android:id="@*android:id/search_plate"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <view android:id="@*android:id/search_src_text"
+                class="android.widget.SearchView$SearchAutoComplete"
+                android:layout_width="0dp"
+                android:layout_height="36dip"
+                android:layout_gravity="bottom"
+                android:layout_weight="1"
+                android:background="@null"
+                android:dropDownAnchor="@*android:id/search_edit_frame"
+                android:dropDownHeight="wrap_content"
+                android:dropDownHorizontalOffset="0dip"
+                android:dropDownVerticalOffset="0dip"
+                android:ellipsize="end"
+                android:imeOptions="actionSearch"
+                android:inputType="text|textAutoComplete|textNoSuggestions"
+                android:minWidth="@*android:dimen/search_view_text_min_width"
+                android:paddingEnd="@*android:dimen/dropdownitem_text_padding_right"
+                android:paddingStart="@*android:dimen/dropdownitem_text_padding_left"
+                android:singleLine="true"
+                android:textColor="@color/searchview_text" />
+
+            <ImageView
+                android:id="@*android:id/search_close_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_vertical"
+                android:background="?android:attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@*android:string/searchview_description_clear"
+                android:focusable="true"
+                android:paddingEnd="8dip"
+                android:paddingStart="8dip" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@*android:id/submit_area"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@*android:id/search_go_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_vertical"
+                android:background="?android:attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@*android:string/searchview_description_submit"
+                android:focusable="true"
+                android:paddingEnd="16dip"
+                android:paddingStart="16dip"
+                android:visibility="gone" />
+
+            <ImageView
+                android:id="@*android:id/search_voice_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_vertical"
+                android:background="?android:attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@*android:string/searchview_description_voice"
+                android:focusable="true"
+                android:paddingEnd="16dip"
+                android:paddingStart="16dip"
+                android:visibility="gone" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

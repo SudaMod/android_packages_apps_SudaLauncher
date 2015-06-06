@@ -16,13 +16,21 @@
 -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:background="@drawable/quantum_panel">
 
     <SearchView
         android:id="@+id/apps_filter"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:closeIcon="@drawable/ic_clear_material_dark"
+        android:commitIcon="@drawable/ic_commit_search_api_material_dark"
+        android:goIcon="@drawable/ic_go_search_api_material_dark"
+        android:inputType="text"
+        android:layout="@layout/search_view"
         android:maxLines="1"
-        android:inputType="text" />
+        android:searchHintIcon="@drawable/ic_search_api_material_dark"
+        android:searchIcon="@drawable/ic_search_api_material_dark"
+        android:voiceIcon="@drawable/ic_voice_search_api_material_dark" />
 
 </FrameLayout>
