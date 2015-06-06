@@ -29,6 +29,7 @@
         android:inputType="text"
         android:layout="@layout/search_view"
         android:maxLines="1"
+        android:queryHint="@string/hint_filter_apps"
         android:searchHintIcon="@drawable/ic_search_api_material_dark"
         android:searchIcon="@drawable/ic_search_api_material_dark"
         android:voiceIcon="@drawable/ic_voice_search_api_material_dark" />

@@ -94,7 +94,8 @@
                 android:paddingEnd="@*android:dimen/dropdownitem_text_padding_right"
                 android:paddingStart="@*android:dimen/dropdownitem_text_padding_left"
                 android:singleLine="true"
-                android:textColor="@color/searchview_text" />
+                android:textColor="@color/searchview_text"
+                android:textColorHint="@color/searchview_hint" />
 
             <ImageView
                 android:id="@*android:id/search_close_btn"

@@ -52,4 +52,5 @@
 
     <color name="tint_searchview">#8a000000</color>
     <color name="searchview_text">#8a000000</color>
+    <color name="searchview_hint">#80000000</color>
 </resources>
