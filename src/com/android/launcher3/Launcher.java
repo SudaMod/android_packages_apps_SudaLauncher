@@ -289,6 +289,8 @@ public class Launcher extends Activity
 
     private Hotseat mHotseat;
     private ViewGroup mOverviewPanel;
+
+    private boolean mHideTopBar;
     private FrameLayout mAppsCustomizeTopBar;
 
     private View mAllAppsButton;
@@ -1609,9 +1611,9 @@ public class Launcher extends Activity
     }
 
     private void setAppsCustomizeTopBarVisible() {
-        boolean hideAppsCustomizeTopBar = SettingsProvider.getBooleanCustomDefault(this,
+        mHideTopBar = SettingsProvider.getBooleanCustomDefault(this,
                 SettingsProvider.SETTINGS_UI_DRAWER_HIDE_TOP_BAR, false);
-        setAppsCustomizeTopBarVisible(!hideAppsCustomizeTopBar);
+        setAppsCustomizeTopBarVisible(!mHideTopBar);
     }
 
     public void setAppsCustomizeTopBarVisible(boolean visible) {
@@ -3585,12 +3587,18 @@ public class Launcher extends Activity
                 mStateAnimation.play(itemsAlpha);
             }
 
-            final View topBar = toView.findViewById(R.id.apps_top_bar);
-            topBar.setLayerType(View.LAYER_TYPE_HARDWARE, null);
-            topBar.setAlpha(0.01f);
-            ObjectAnimator topBarAlpha =
-                    ObjectAnimator.ofFloat(topBar, "alpha", 1f);
-            topBarAlpha.setDuration(revealDuration);
+            final View topBar;
+            final ObjectAnimator topBarAlpha;
+            if (mHideTopBar) {
+                topBar = null;
+                topBarAlpha = null;
+            } else {
+                topBar = toView.findViewById(R.id.apps_top_bar);
+                topBar.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+                topBar.setAlpha(0.01f);
+                topBarAlpha = ObjectAnimator.ofFloat(topBar, "alpha", 1f);
+                topBarAlpha.setDuration(revealDuration);
+            }
 
             final View pageIndicators = toView.findViewById(R.id.apps_customize_page_indicator);
             pageIndicators.setLayerType(View.LAYER_TYPE_HARDWARE, null);
@@ -3598,7 +3606,11 @@ public class Launcher extends Activity
             ObjectAnimator indicatorsAlpha =
                     ObjectAnimator.ofFloat(pageIndicators, "alpha", 1f);
             indicatorsAlpha.setDuration(revealDuration);
-            mStateAnimation.play(indicatorsAlpha).with(topBarAlpha);
+            if (mHideTopBar) {
+                mStateAnimation.play(indicatorsAlpha);
+            } else {
+                mStateAnimation.play(indicatorsAlpha).with(topBarAlpha);
+            }
 
             final View allApps = getAllAppsButton();
             int allAppsButtonSize = LauncherAppState.getInstance().
@@ -3632,11 +3644,13 @@ public class Launcher extends Activity
 
                     revealView.setVisibility(View.INVISIBLE);
                     revealView.setLayerType(View.LAYER_TYPE_NONE, null);
+                    if (topBar != null) {
+                        topBar.setLayerType(View.LAYER_TYPE_NONE, null);
+                    }
+                    pageIndicators.setLayerType(View.LAYER_TYPE_NONE, null);
                     if (page != null) {
                         page.setLayerType(View.LAYER_TYPE_NONE, null);
                     }
-                    topBar.setLayerType(View.LAYER_TYPE_NONE, null);
-                    pageIndicators.setLayerType(View.LAYER_TYPE_NONE, null);
                     content.setPageBackgroundsVisible(true);
 
                     // Hide the search bar
@@ -3758,13 +3772,19 @@ public class Launcher extends Activity
 
             final View revealView = fromView.findViewById(R.id.fake_page);
 
-            final View topBar = fromView.findViewById(R.id.apps_top_bar);
-            topBar.setLayerType(View.LAYER_TYPE_HARDWARE, null);
-            topBar.setAlpha(1f);
-            ObjectAnimator topBarAlpha =
-                    LauncherAnimUtils.ofFloat(topBar, "alpha", 0f);
-            topBarAlpha.setDuration(revealDuration);
-            topBarAlpha.setInterpolator(new DecelerateInterpolator(1.5f));
+            final View topBar;
+            final ObjectAnimator topBarAlpha;
+            if (mHideTopBar) {
+                topBar = null;
+                topBarAlpha = null;
+            } else {
+                topBar = fromView.findViewById(R.id.apps_top_bar);
+                topBar.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+                topBar.setAlpha(1f);
+                topBarAlpha = ObjectAnimator.ofFloat(topBar, "alpha", 0f);
+                topBarAlpha.setDuration(revealDuration);
+                topBarAlpha.setInterpolator(new DecelerateInterpolator(1.5f));
+            }
 
             final View pageIndicators = fromView.findViewById(R.id.apps_customize_page_indicator);
             pageIndicators.setLayerType(View.LAYER_TYPE_HARDWARE, null);
@@ -3773,7 +3793,11 @@ public class Launcher extends Activity
                     LauncherAnimUtils.ofFloat(pageIndicators, "alpha", 0f);
             indicatorsAlpha.setDuration(revealDuration);
             indicatorsAlpha.setInterpolator(new DecelerateInterpolator(1.5f));
-            mStateAnimation.play(indicatorsAlpha).with(topBarAlpha);
+            if (mHideTopBar) {
+                mStateAnimation.play(indicatorsAlpha);
+            } else {
+                mStateAnimation.play(indicatorsAlpha).with(topBarAlpha);
+            }
 
             // hideAppsCustomizeHelper is called in some cases when it is already hidden
             // don't perform all these no-op animations. In particularly, this was causing
@@ -3874,11 +3898,14 @@ public class Launcher extends Activity
                         if (!isWidgetTray) {
                             allAppsButton.setVisibility(View.VISIBLE);
                         }
-                        SearchView filterApps = (SearchView) topBar.findViewById(R.id.apps_filter);
-                        if (filterApps != null) {
-                            filterApps.setQuery("", true);
-                            filterApps.setIconified(true);
-                            filterApps.clearFocus();
+                        if (topBar != null) {
+                            SearchView filterApps =
+                                    (SearchView) topBar.findViewById(R.id.apps_filter);
+                            if (filterApps != null) {
+                                filterApps.setQuery("", true);
+                                filterApps.setIconified(true);
+                                filterApps.clearFocus();
+                            }
                         }
                     }
                 });
@@ -3901,11 +3928,13 @@ public class Launcher extends Activity
                     }
 
                     revealView.setLayerType(View.LAYER_TYPE_NONE, null);
+                    if (topBar != null) {
+                        topBar.setLayerType(View.LAYER_TYPE_NONE, null);
+                    }
+                    pageIndicators.setLayerType(View.LAYER_TYPE_NONE, null);
                     if (page != null) {
                         page.setLayerType(View.LAYER_TYPE_NONE, null);
                     }
-                    topBar.setLayerType(View.LAYER_TYPE_NONE, null);
-                    pageIndicators.setLayerType(View.LAYER_TYPE_NONE, null);
                     content.setPageBackgroundsVisible(true);
                     // Unhide side pages
                     int count = content.getChildCount();
