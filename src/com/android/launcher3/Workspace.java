@@ -62,9 +62,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewPropertyAnimator;
-import android.view.animation.AccelerateDecelerateInterpolator;
-
 import android.view.accessibility.AccessibilityManager;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Interpolator;
 import android.widget.TextView;
@@ -75,9 +74,10 @@ import com.android.launcher3.LauncherSettings.Favorites;
 import com.android.launcher3.compat.PackageInstallerCompat;
 import com.android.launcher3.compat.PackageInstallerCompat.PackageInstallInfo;
 import com.android.launcher3.compat.UserHandleCompat;
-import org.namelessrom.perception.gestures.GestureHelper;
-import org.namelessrom.perception.actions.DefaultActionListener;
 import com.android.launcher3.settings.SettingsProvider;
+
+import org.namelessrom.perception.actions.DefaultActionListener;
+import org.namelessrom.perception.gestures.GestureHelper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -2592,7 +2592,8 @@ public class Workspace extends SmoothPagedView
         }
         mLauncher.updateVoiceButtonProxyVisible(false);
 
-        if (stateIsNormal || stateIsNormalHidden) {
+        if (stateIsNormal ||(mLauncher.getDrawerType() == AppDrawerListAdapter.DrawerType.Drawer &&
+                stateIsNormalHidden)) {
             animateBackgroundGradient(0f, animated);
         } else {
             animateBackgroundGradient(getResources().getInteger(
