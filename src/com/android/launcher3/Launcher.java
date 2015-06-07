@@ -3676,6 +3676,7 @@ public class Launcher extends Activity
                 mStateAnimation.play(itemsAlpha);
 
                 if (drawerContent != null) {
+                    drawerContent.setLayerType(View.LAYER_TYPE_HARDWARE, null);
                     drawerContent.setTranslationY(toView.getHeight());
                     ObjectAnimator slideIn = ObjectAnimator.ofFloat(drawerContent,
                             "translationY", 1000, 0);
@@ -3684,6 +3685,7 @@ public class Launcher extends Activity
                     mStateAnimation.play(slideIn);
                 }
                 if (drawerScrubber != null) {
+                    drawerScrubber.setLayerType(View.LAYER_TYPE_HARDWARE, null);
                     drawerScrubber.setAlpha(0f);
                     ObjectAnimator fadeIn = ObjectAnimator.ofFloat(drawerScrubber,
                             "alpha", 0f, 1f);
@@ -3771,6 +3773,12 @@ public class Launcher extends Activity
                     }
                     if (page != null) {
                         page.setLayerType(View.LAYER_TYPE_NONE, null);
+                    }
+                    if (drawerContent != null) {
+                        drawerContent.setLayerType(View.LAYER_TYPE_NONE, null);
+                    }
+                    if (drawerScrubber != null) {
+                        drawerScrubber.setLayerType(View.LAYER_TYPE_NONE, null);
                     }
                     if (content != null) {
                         content.setPageBackgroundsVisible(true);
@@ -3944,6 +3952,9 @@ public class Launcher extends Activity
                 }
             }
 
+            final View drawerScrubber = content == null ?
+                    fromView.findViewById(R.id.scrubber_container) : null;
+
             // hideAppsCustomizeHelper is called in some cases when it is already hidden
             // don't perform all these no-op animations. In particularly, this was causing
             // the all-apps button to pop in and out.
@@ -4014,9 +4025,6 @@ public class Launcher extends Activity
                     mStateAnimation.play(panelAlpha);
                 }
 
-                final View drawerScrubber = content == null ?
-                        fromView.findViewById(R.id.scrubber_container) : null;
-
                 if (page != null) {
                     page.setLayerType(View.LAYER_TYPE_HARDWARE, null);
 
@@ -4035,6 +4043,7 @@ public class Launcher extends Activity
                     mStateAnimation.play(itemsAlpha);
 
                     if (drawerScrubber != null) {
+                        drawerScrubber.setLayerType(View.LAYER_TYPE_HARDWARE, null);
                         drawerScrubber.setAlpha(1f);
                         ObjectAnimator fadeOut = ObjectAnimator.ofFloat(drawerScrubber,
                                 "alpha", 1f, 0f);
@@ -4101,6 +4110,9 @@ public class Launcher extends Activity
                     }
                     if (page != null) {
                         page.setLayerType(View.LAYER_TYPE_NONE, null);
+                    }
+                    if (drawerScrubber != null) {
+                        drawerScrubber.setLayerType(View.LAYER_TYPE_NONE, null);
                     }
                     if (content != null) {
                         content.setPageBackgroundsVisible(true);
