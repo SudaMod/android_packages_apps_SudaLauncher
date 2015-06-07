@@ -16,6 +16,7 @@
      limitations under the License.
 -->
 <resources>
+  <string name="preferences_text">Preferencje</string>
   <string name="gesture_settings">Gesty</string>
   <string name="gesture_choose">Wybierz czynność</string>
   <string name="gesture_swipe_down">Przesuń palcem w dół</string>

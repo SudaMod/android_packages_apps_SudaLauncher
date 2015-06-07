@@ -16,6 +16,7 @@
      limitations under the License.
 -->
 <resources>
+  <string name="preferences_text">Impostazioni</string>
   <string name="gesture_settings">Gesti</string>
   <string name="gesture_summary">Definire azioni diverse per gesti</string>
   <string name="gesture_choose">Scegli l\'azione</string>

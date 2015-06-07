@@ -17,6 +17,7 @@
      limitations under the License.
 -->
 <resources>
+  <string name="preferences_text">首选项</string>
   <string name="gesture_settings">手势操作</string>
   <string name="gesture_summary">为手势选择动作</string>
   <string name="gesture_choose">选择操作</string>

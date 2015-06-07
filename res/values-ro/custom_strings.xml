@@ -16,6 +16,7 @@
      limitations under the License.
 -->
 <resources>
+  <string name="preferences_text">Preferinţe</string>
   <string name="gesture_settings">Gesturi</string>
   <string name="gesture_choose">Alege acțiunea</string>
   <string name="gesture_swipe_down">Glisați în jos</string>

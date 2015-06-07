@@ -16,6 +16,7 @@
      limitations under the License.
 -->
 <resources>
+  <string name="preferences_text">Настройки</string>
   <string name="gesture_settings">Жесты</string>
   <string name="gesture_choose">Выбрать действие</string>
   <string name="gesture_swipe_down">Свайп вниз</string>

@@ -16,6 +16,7 @@
      limitations under the License.
 -->
 <resources>
+  <string name="preferences_text">Inställningar</string>
   <string name="gesture_settings">Gester</string>
   <string name="gesture_choose">Välj åtgärd</string>
   <string name="gesture_swipe_down">Svep nedåt</string>
