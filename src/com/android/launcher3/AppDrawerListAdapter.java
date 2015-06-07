@@ -137,7 +137,6 @@ public class AppDrawerListAdapter extends RecyclerView.Adapter<AppDrawerListAdap
         private static final long ANIMATION_DURATION = 200;
         private static final float MAX_SCALE = 2f;
         private static final float MIN_SCALE = 1f;
-        private static final float FAST_SCROLL = 0.3f;
         private static final int NO_SECTION_TARGET = -1;
 
         private final float YDPI;
@@ -150,8 +149,6 @@ public class AppDrawerListAdapter extends RecyclerView.Adapter<AppDrawerListAdap
         private boolean mPendingShrink;
         private long mStartTime;
         private int mScrollState;
-        private float mFastScrollSpeed;
-        private float mLastScrollSpeed;
 
         // If the user is scrubbing, we want to highlight the target section differently,
         // so we use this to track where the user is currently scrubbing to
@@ -193,7 +190,6 @@ public class AppDrawerListAdapter extends RecyclerView.Adapter<AppDrawerListAdap
         public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
             if (newState != mScrollState) {
                 mScrollState = newState;
-                mFastScrollSpeed = 0;
                 checkAnimationState();
 
                 // If the user is dragging, clear the section target
@@ -206,9 +202,6 @@ public class AppDrawerListAdapter extends RecyclerView.Adapter<AppDrawerListAdap
 
         public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
             if (mScrollState == RecyclerView.SCROLL_STATE_SETTLING) {
-                mLastScrollSpeed = Math.abs(dy / YDPI);
-                // get the max of the current scroll speed and the previous fastest scroll speed
-                mFastScrollSpeed = Math.max(mFastScrollSpeed, mLastScrollSpeed);
                 checkAnimationState();
             }
         }
@@ -220,9 +213,7 @@ public class AppDrawerListAdapter extends RecyclerView.Adapter<AppDrawerListAdap
 
         private void checkAnimationState() {
             // if the user is dragging or if we're settling at a fast speed, then show animation
-            showAnimation(mDragging ||
-                    (mScrollState == RecyclerView.SCROLL_STATE_SETTLING &&
-                    mFastScrollSpeed >= FAST_SCROLL));
+            showAnimation(mDragging);
         }
 
         private void showAnimation(boolean expanding) {
@@ -235,7 +226,6 @@ public class AppDrawerListAdapter extends RecyclerView.Adapter<AppDrawerListAdap
                 // the expand animation is still playing, then mark pending shrink as true
                 if (!mDragging
                         && mScrollState == RecyclerView.SCROLL_STATE_IDLE
-                        && mLastScrollSpeed > FAST_SCROLL
                         && System.currentTimeMillis() - mStartTime < ANIMATION_DURATION) {
                     mPendingShrink = true;
                     return;
@@ -283,7 +273,6 @@ public class AppDrawerListAdapter extends RecyclerView.Adapter<AppDrawerListAdap
 
                 if (mPendingShrink) {
                     mPendingShrink = false;
-                    mLastScrollSpeed = 0;
                     checkAnimationState();
                 }
 
