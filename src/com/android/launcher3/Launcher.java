@@ -1516,7 +1516,7 @@ public class Launcher extends Activity
 
         mLauncherView.setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
-        mWorkspaceBackgroundDrawable = getResources().getDrawable(R.drawable.workspace_bg);
+        mWorkspaceBackgroundDrawable = getDrawable(R.drawable.workspace_bg);
 
         // Setup the drag layer
         mDragLayer.setup(this, dragController);
@@ -3601,12 +3601,12 @@ public class Launcher extends Activity
 
             final boolean isWidgetTray = contentType == AppsCustomizePagedView.ContentType.Widgets;
             if (isWidgetTray) {
-                revealView.setBackground(res.getDrawable(R.drawable.quantum_panel_dark));
+                revealView.setBackground(getDrawable(R.drawable.quantum_panel_dark));
             } else {
                 if (drawer) {
                     revealView.setBackgroundColor(res.getColor(R.color.app_drawer_background));
                 } else {
-                    revealView.setBackground(res.getDrawable(R.drawable.quantum_panel));
+                    revealView.setBackground(getDrawable(R.drawable.quantum_panel));
                 }
             }
 
@@ -3965,12 +3965,12 @@ public class Launcher extends Activity
                         contentType == AppsCustomizePagedView.ContentType.Widgets;
 
                 if (isWidgetTray) {
-                    revealView.setBackground(res.getDrawable(R.drawable.quantum_panel_dark));
+                    revealView.setBackground(getDrawable(R.drawable.quantum_panel_dark));
                 } else {
                     if (drawer) {
                         revealView.setBackgroundColor(res.getColor(R.color.app_drawer_background));
                     } else {
-                        revealView.setBackground(res.getDrawable(R.drawable.quantum_panel));
+                        revealView.setBackground(getDrawable(R.drawable.quantum_panel));
                     }
                 }
 
@@ -4393,7 +4393,7 @@ public class Launcher extends Activity
         TextView button = (TextView) findViewById(buttonId);
         // If we were unable to find the icon via the meta-data, use a generic one
         if (toolbarIcon == null) {
-            toolbarIcon = r.getDrawable(fallbackDrawableId);
+            toolbarIcon = getDrawable(fallbackDrawableId);
             toolbarIcon.setBounds(0, 0, w, h);
             if (button != null) {
                 button.setCompoundDrawables(toolbarIcon, null, null, null);

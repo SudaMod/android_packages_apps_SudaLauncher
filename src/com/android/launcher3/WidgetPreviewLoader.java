@@ -541,12 +541,10 @@ public class WidgetPreviewLoader {
             if (cellVSpan < 1) cellVSpan = 1;
 
             // This Drawable is not directly drawn, so there's no need to mutate it.
-            BitmapDrawable previewDrawable = (BitmapDrawable) mContext.getResources()
-                    .getDrawable(R.drawable.widget_tile);
-            final int previewDrawableWidth = previewDrawable
-                    .getIntrinsicWidth();
-            final int previewDrawableHeight = previewDrawable
-                    .getIntrinsicHeight();
+            BitmapDrawable previewDrawable =
+                    (BitmapDrawable) mContext.getDrawable(R.drawable.widget_tile);
+            final int previewDrawableWidth = previewDrawable.getIntrinsicWidth();
+            final int previewDrawableHeight = previewDrawable.getIntrinsicHeight();
             previewWidth = previewDrawableWidth * cellHSpan;
             previewHeight = previewDrawableHeight * cellVSpan;
 

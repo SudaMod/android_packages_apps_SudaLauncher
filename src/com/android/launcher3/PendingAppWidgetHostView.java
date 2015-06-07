@@ -114,7 +114,7 @@ public class PendingAppWidgetHostView extends LauncherAppWidgetHostView implemen
             // The view displays two modes, one with a setup icon and another with a preload icon
             // in the center.
             if (isReadyForClickSetup()) {
-                mCenterDrawable = getResources().getDrawable(R.drawable.ic_setting);
+                mCenterDrawable = getContext().getDrawable(R.drawable.ic_setting);
                 mTopCornerDrawable = new FastBitmapDrawable(mIcon);
             } else {
                 if (sPreloaderTheme == null) {

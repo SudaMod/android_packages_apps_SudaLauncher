@@ -326,7 +326,7 @@ public class AutoInstallsLayout implements WorkspaceLoader {
                 if (LOGD) Log.d(TAG, "Ignoring shortcut, invalid url: " + url);
                 return -1;
             }
-            Drawable icon = res.getDrawable(iconId);
+            Drawable icon = mContext.getDrawable(iconId);
             if (icon == null) {
                 if (LOGD) Log.d(TAG, "Ignoring shortcut, can't load icon");
                 return -1;

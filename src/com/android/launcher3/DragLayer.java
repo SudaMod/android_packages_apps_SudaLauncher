@@ -104,12 +104,11 @@ public class DragLayer extends FrameLayout implements ViewGroup.OnHierarchyChang
         setChildrenDrawingOrderEnabled(true);
         setOnHierarchyChangeListener(this);
 
-        final Resources res = getResources();
-        mLeftHoverDrawable = res.getDrawable(R.drawable.page_hover_left);
-        mRightHoverDrawable = res.getDrawable(R.drawable.page_hover_right);
-        mLeftHoverDrawableActive = res.getDrawable(R.drawable.page_hover_left_active);
-        mRightHoverDrawableActive = res.getDrawable(R.drawable.page_hover_right_active);
-        mBackground = res.getDrawable(R.drawable.apps_customize_bg);
+        mLeftHoverDrawable = context.getDrawable(R.drawable.page_hover_left);
+        mRightHoverDrawable = context.getDrawable(R.drawable.page_hover_right);
+        mLeftHoverDrawableActive = context.getDrawable(R.drawable.page_hover_left_active);
+        mRightHoverDrawableActive = context.getDrawable(R.drawable.page_hover_right_active);
+        mBackground = context.getDrawable(R.drawable.apps_customize_bg);
     }
 
     public void setup(Launcher launcher, DragController controller) {

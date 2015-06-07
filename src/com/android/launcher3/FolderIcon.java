@@ -219,9 +219,9 @@ public class FolderIcon extends FrameLayout implements FolderListener {
                 DeviceProfile grid = app.getDynamicGrid().getDeviceProfile();
                 sPreviewSize = grid.folderIconSizePx;
                 sPreviewPadding = res.getDimensionPixelSize(R.dimen.folder_preview_padding);
-                sSharedOuterRingDrawable = res.getDrawable(R.drawable.portal_ring_outer_holo);
-                sSharedInnerRingDrawable = res.getDrawable(R.drawable.portal_ring_inner_nolip_holo);
-                sSharedFolderLeaveBehind = res.getDrawable(R.drawable.portal_ring_rest);
+                sSharedOuterRingDrawable = launcher.getDrawable(R.drawable.portal_ring_outer_holo);
+                sSharedInnerRingDrawable = launcher.getDrawable(R.drawable.portal_ring_inner_nolip_holo);
+                sSharedFolderLeaveBehind = launcher.getDrawable(R.drawable.portal_ring_rest);
                 sStaticValuesDirty = false;
             }
         }
@@ -654,7 +654,7 @@ public class FolderIcon extends FrameLayout implements FolderListener {
             canvas.save();
             canvas.translate(mParams.transX + mPreviewOffsetX, mParams.transY + mPreviewOffsetY);
             canvas.scale(mParams.scale, mParams.scale);
-            Drawable lock = getResources().getDrawable(R.drawable.folder_lock);
+            Drawable lock = getContext().getDrawable(R.drawable.folder_lock);
             lock.setBounds(0, 0, mIntrinsicIconSize, mIntrinsicIconSize);
             lock.draw(canvas);
             canvas.restore();

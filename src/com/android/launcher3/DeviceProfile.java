@@ -944,7 +944,7 @@ public class DeviceProfile {
                 padding.bottom = Math.max(0, pageIndicatorHeight - paddingTB);
 
                 pagedView.setWidgetsPageIndicatorPadding(pageIndicatorHeight);
-                fakePage.setBackground(res.getDrawable(R.drawable.quantum_panel));
+                fakePage.setBackground(launcher.getDrawable(R.drawable.quantum_panel));
 
                 // Horizontal padding for the whole paged view
                 int pagedFixedViewPadding =

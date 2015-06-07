@@ -94,7 +94,7 @@ public class AppDrawerListAdapter extends RecyclerView.Adapter<AppDrawerListAdap
         Pager(1);
 
         private final int mValue;
-        private DrawerType(int value) {
+        DrawerType(int value) {
             mValue = value;
         }
 
@@ -139,7 +139,6 @@ public class AppDrawerListAdapter extends RecyclerView.Adapter<AppDrawerListAdap
         private static final float MIN_SCALE = 1f;
         private static final int NO_SECTION_TARGET = -1;
 
-        private final float YDPI;
         private final HashSet<ViewHolder> mViewHolderSet;
         private final Interpolator mInterpolator;
         private final View.OnLayoutChangeListener mLayoutChangeListener;
@@ -162,7 +161,6 @@ public class AppDrawerListAdapter extends RecyclerView.Adapter<AppDrawerListAdap
             mSectionTarget = NO_SECTION_TARGET;
             mViewHolderSet = new HashSet<>();
             mInterpolator = new DecelerateInterpolator();
-            YDPI = ctx.getResources().getDisplayMetrics().ydpi;
 
             mLayoutChangeListener = new View.OnLayoutChangeListener() {
                 @Override

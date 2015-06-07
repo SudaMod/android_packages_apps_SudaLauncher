@@ -327,7 +327,7 @@ public class AppDrawerScrubber extends LinearLayout {
 
         // show a white line if there are no letters, otherwise show transparent
         Drawable d = mSectionContainer.showLetters() ? mTransparentDrawable
-            : getContext().getResources().getDrawable(R.drawable.seek_back);
+            : getContext().getDrawable(R.drawable.seek_back);
         ((ViewGroup)mSeekBar.getParent()).setBackground(d);
 
     }
@@ -417,7 +417,7 @@ public class AppDrawerScrubber extends LinearLayout {
                             animateOut();
                         }
                     }
-                }).start();
+                }).withLayer().start();
         }
 
         private void animateOut() {
@@ -435,7 +435,7 @@ public class AppDrawerScrubber extends LinearLayout {
                     public void onAnimationEnd(Animator animation) {
                         mScrubberIndicator.setVisibility(View.INVISIBLE);
                     }
-                });
+                }).withLayer();
         }
 
         @Override

@@ -1012,7 +1012,7 @@ public class AppsCustomizePagedView extends PagedViewWithDraggableItems implemen
         int heightSpec = MeasureSpec.makeMeasureSpec(mContentHeight, MeasureSpec.AT_MOST);
         layout.measure(widthSpec, heightSpec);
 
-        Drawable bg = getContext().getResources().getDrawable(R.drawable.quantum_panel);
+        Drawable bg = getContext().getDrawable(R.drawable.quantum_panel);
         if (bg != null) {
             bg.setAlpha(mPageBackgroundsVisible ? 255: 0);
             layout.setBackground(bg);
@@ -1175,7 +1175,7 @@ public class AppsCustomizePagedView extends PagedViewWithDraggableItems implemen
         int widthSpec = MeasureSpec.makeMeasureSpec(mContentWidth, MeasureSpec.AT_MOST);
         int heightSpec = MeasureSpec.makeMeasureSpec(mContentHeight, MeasureSpec.AT_MOST);
 
-        Drawable bg = getContext().getResources().getDrawable(R.drawable.quantum_panel_dark);
+        Drawable bg = getContext().getDrawable(R.drawable.quantum_panel_dark);
         if (bg != null) {
             bg.setAlpha(mPageBackgroundsVisible ? 255 : 0);
             layout.setBackground(bg);
@@ -1836,7 +1836,8 @@ public class AppsCustomizePagedView extends PagedViewWithDraggableItems implemen
         for (Object i: list) {
             if (i instanceof AppWidgetProviderInfo) {
                 AppWidgetProviderInfo info = (AppWidgetProviderInfo) i;
-                Log.d(tag, "   label=\"" + info.label + "\" previewImage=" + info.previewImage
+                Log.d(tag, "   label=\"" + info.loadLabel(mPackageManager)
+                        + "\" previewImage=" + info.previewImage
                         + " resizeMode=" + info.resizeMode + " configure=" + info.configure
                         + " initialLayout=" + info.initialLayout
                         + " minWidth=" + info.minWidth + " minHeight=" + info.minHeight);
