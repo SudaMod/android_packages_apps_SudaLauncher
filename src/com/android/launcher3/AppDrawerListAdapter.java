@@ -23,6 +23,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.os.PowerManager;
 import android.provider.Settings;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -143,6 +144,8 @@ public class AppDrawerListAdapter extends RecyclerView.Adapter<AppDrawerListAdap
         private final Interpolator mInterpolator;
         private final View.OnLayoutChangeListener mLayoutChangeListener;
 
+        private final PowerManager mPowerManager;
+
         private boolean mDragging;
         private boolean mExpanding;
         private boolean mPendingShrink;
@@ -154,6 +157,7 @@ public class AppDrawerListAdapter extends RecyclerView.Adapter<AppDrawerListAdap
         private int mSectionTarget;
 
         public ItemAnimatorSet(Context ctx) {
+            mPowerManager = mLauncher.getPowerManager();
             mDragging = false;
             mExpanding = false;
             mPendingShrink = false;
@@ -187,6 +191,7 @@ public class AppDrawerListAdapter extends RecyclerView.Adapter<AppDrawerListAdap
 
         public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
             if (newState != mScrollState) {
+                mPowerManager.cpuBoost(750000);
                 mScrollState = newState;
                 checkAnimationState();
 
