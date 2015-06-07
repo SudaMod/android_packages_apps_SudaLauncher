@@ -3585,13 +3585,15 @@ public class Launcher extends Activity
                 mStateAnimation.play(itemsAlpha);
             }
 
-            View topBar = toView.findViewById(R.id.apps_top_bar);
+            final View topBar = toView.findViewById(R.id.apps_top_bar);
+            topBar.setLayerType(View.LAYER_TYPE_HARDWARE, null);
             topBar.setAlpha(0.01f);
             ObjectAnimator topBarAlpha =
                     ObjectAnimator.ofFloat(topBar, "alpha", 1f);
             topBarAlpha.setDuration(revealDuration);
 
-            View pageIndicators = toView.findViewById(R.id.apps_customize_page_indicator);
+            final View pageIndicators = toView.findViewById(R.id.apps_customize_page_indicator);
+            pageIndicators.setLayerType(View.LAYER_TYPE_HARDWARE, null);
             pageIndicators.setAlpha(0.01f);
             ObjectAnimator indicatorsAlpha =
                     ObjectAnimator.ofFloat(pageIndicators, "alpha", 1f);
@@ -3633,6 +3635,8 @@ public class Launcher extends Activity
                     if (page != null) {
                         page.setLayerType(View.LAYER_TYPE_NONE, null);
                     }
+                    topBar.setLayerType(View.LAYER_TYPE_NONE, null);
+                    pageIndicators.setLayerType(View.LAYER_TYPE_NONE, null);
                     content.setPageBackgroundsVisible(true);
 
                     // Hide the search bar
@@ -3751,7 +3755,25 @@ public class Launcher extends Activity
                     child.setVisibility(View.INVISIBLE);
                 }
             }
+
             final View revealView = fromView.findViewById(R.id.fake_page);
+
+            final View topBar = fromView.findViewById(R.id.apps_top_bar);
+            topBar.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+            topBar.setAlpha(1f);
+            ObjectAnimator topBarAlpha =
+                    LauncherAnimUtils.ofFloat(topBar, "alpha", 0f);
+            topBarAlpha.setDuration(revealDuration);
+            topBarAlpha.setInterpolator(new DecelerateInterpolator(1.5f));
+
+            final View pageIndicators = fromView.findViewById(R.id.apps_customize_page_indicator);
+            pageIndicators.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+            pageIndicators.setAlpha(1f);
+            ObjectAnimator indicatorsAlpha =
+                    LauncherAnimUtils.ofFloat(pageIndicators, "alpha", 0f);
+            indicatorsAlpha.setDuration(revealDuration);
+            indicatorsAlpha.setInterpolator(new DecelerateInterpolator(1.5f));
+            mStateAnimation.play(indicatorsAlpha).with(topBarAlpha);
 
             // hideAppsCustomizeHelper is called in some cases when it is already hidden
             // don't perform all these no-op animations. In particularly, this was causing
@@ -3831,21 +3853,6 @@ public class Launcher extends Activity
                     mStateAnimation.play(itemsAlpha);
                 }
 
-                final View topBar = fromView.findViewById(R.id.apps_top_bar);
-                topBar.setAlpha(1f);
-                ObjectAnimator topBarAlpha =
-                        LauncherAnimUtils.ofFloat(topBar, "alpha", 0f);
-                topBarAlpha.setDuration(revealDuration);
-                topBarAlpha.setInterpolator(new DecelerateInterpolator(1.5f));
-
-                View pageIndicators = fromView.findViewById(R.id.apps_customize_page_indicator);
-                pageIndicators.setAlpha(1f);
-                ObjectAnimator indicatorsAlpha =
-                        LauncherAnimUtils.ofFloat(pageIndicators, "alpha", 0f);
-                indicatorsAlpha.setDuration(revealDuration);
-                indicatorsAlpha.setInterpolator(new DecelerateInterpolator(1.5f));
-                mStateAnimation.play(indicatorsAlpha).with(topBarAlpha);
-
                 width = revealView.getMeasuredWidth();
 
                 if (!isWidgetTray) {
@@ -3897,6 +3904,8 @@ public class Launcher extends Activity
                     if (page != null) {
                         page.setLayerType(View.LAYER_TYPE_NONE, null);
                     }
+                    topBar.setLayerType(View.LAYER_TYPE_NONE, null);
+                    pageIndicators.setLayerType(View.LAYER_TYPE_NONE, null);
                     content.setPageBackgroundsVisible(true);
                     // Unhide side pages
                     int count = content.getChildCount();
