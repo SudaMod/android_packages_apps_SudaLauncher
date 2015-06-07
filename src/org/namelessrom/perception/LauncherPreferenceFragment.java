@@ -60,6 +60,7 @@ public class LauncherPreferenceFragment extends PreferenceFragment implements Pr
     private SwitchPreference mStatusBarVisibility;
 
     // Drawer
+    private ListPreference mDrawerType;
     private ListPreference mSortMode;
     private SwitchPreference mHideTopBar;
 
@@ -89,6 +90,10 @@ public class LauncherPreferenceFragment extends PreferenceFragment implements Pr
         mStatusBarVisibility.setOnPreferenceChangeListener(this);
 
         // Drawer
+        mDrawerType = (ListPreference) findPreference(SettingsProvider.SETTINGS_UI_DRAWER_TYPE);
+        mDrawerType.setSummary(mDrawerType.getEntry());
+        mDrawerType.setOnPreferenceChangeListener(this);
+
         mSortMode = (ListPreference) findPreference(SettingsProvider.SETTINGS_UI_DRAWER_SORT_MODE);
         mSortMode.setSummary(mSortMode.getEntry());
         mSortMode.setOnPreferenceChangeListener(this);
@@ -135,6 +140,9 @@ public class LauncherPreferenceFragment extends PreferenceFragment implements Pr
             preference.setSummary(((ListPreference) preference).getEntries()[index]);
             if (mSortMode == preference) {
                 LauncherConfiguration.updateSortMode = true;
+            }
+            if (mDrawerType == preference) {
+                LauncherConfiguration.updateDrawerType = true;
             }
             return true;
         } else if (mStatusBarVisibility == preference) {

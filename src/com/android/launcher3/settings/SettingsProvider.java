@@ -26,7 +26,7 @@ public final class SettingsProvider {
     public static final String SETTINGS_UI_GLOBAL_HIDE_STATUS_BAR = "global_hide_status_bar";
 
     // Drawer
-    public static final String SETTINGS_UI_DRAWER_TYPE = "ui_drawer_type";
+    public static final String SETTINGS_UI_DRAWER_TYPE = "drawer_type";
     public static final String SETTINGS_UI_DRAWER_SORT_MODE = "drawer_sort_mode";
     public static final String SETTINGS_UI_DRAWER_HIDE_ICON_LABELS = "drawer_hide_icon_labels";
     public static final String SETTINGS_UI_DRAWER_HIDE_TOP_BAR = "drawer_hide_top_bar";

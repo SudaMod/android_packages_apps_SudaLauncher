@@ -96,7 +96,6 @@ import android.view.WindowManager;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
-import android.view.animation.Interpolator;
 import android.view.animation.OvershootInterpolator;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Advanceable;
@@ -5750,6 +5749,7 @@ public class Launcher extends Activity
     }
 
     public void updateStuffIfNeeded() {
+        updateDrawerTypeIfNeeded();
         updateGridIfNeeded();
         updateSortModeIfNeeded();
         updateDrawerTopBarIfNeeded();
@@ -5757,6 +5757,16 @@ public class Launcher extends Activity
         updateAppsTransitionIfNeeded();
         updateWorkspaceIfNeeded();
         flushIconCacheIfNeeded();
+    }
+
+    public boolean updateDrawerTypeIfNeeded() {
+        if (LauncherConfiguration.updateDrawerType) {
+            updateDrawerType();
+            LauncherConfiguration.updateDrawerType = false;
+            return true;
+        }
+
+        return false;
     }
 
     public boolean updateGridIfNeeded() {

@@ -67,6 +67,13 @@
         android:title="@string/drawer_settings">
 
         <ListPreference
+            android:key="drawer_type"
+            android:title="@string/drawer_type"
+            android:entries="@array/drawer_type_entries"
+            android:entryValues="@array/drawer_type_values"
+            android:defaultValue="@integer/preferences_interface_drawer_type_default" />
+
+        <ListPreference
             android:key="drawer_sort_mode"
             android:title="@string/drawer_sorting_text"
             android:entries="@array/drawer_sort_mode_entries"
