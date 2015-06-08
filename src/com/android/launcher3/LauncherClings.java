@@ -88,7 +88,7 @@ class LauncherClings implements OnClickListener {
         content.findViewById(R.id.cling_dismiss_longpress_info).setOnClickListener(this);
 
         if (TAG_CROP_TOP_AND_SIDES.equals(content.getTag())) {
-            Drawable bg = new BorderCropDrawable(mLauncher.getResources().getDrawable(R.drawable.cling_bg),
+            Drawable bg = new BorderCropDrawable(mLauncher.getDrawable(R.drawable.cling_bg),
                     true, true, true, false);
             content.setBackground(bg);
         }

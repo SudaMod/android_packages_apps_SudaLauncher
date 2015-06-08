@@ -62,9 +62,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewPropertyAnimator;
-import android.view.animation.AccelerateDecelerateInterpolator;
-
 import android.view.accessibility.AccessibilityManager;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Interpolator;
 import android.widget.TextView;
@@ -75,9 +74,10 @@ import com.android.launcher3.LauncherSettings.Favorites;
 import com.android.launcher3.compat.PackageInstallerCompat;
 import com.android.launcher3.compat.PackageInstallerCompat.PackageInstallInfo;
 import com.android.launcher3.compat.UserHandleCompat;
-import org.namelessrom.perception.gestures.GestureHelper;
-import org.namelessrom.perception.actions.DefaultActionListener;
 import com.android.launcher3.settings.SettingsProvider;
+
+import org.namelessrom.perception.actions.DefaultActionListener;
+import org.namelessrom.perception.gestures.GestureHelper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -1377,6 +1377,7 @@ public class Workspace extends SmoothPagedView
         // Don't use all the wallpaper for parallax until you have at least this many pages
         private final int MIN_PARALLAX_PAGE_SPAN = 3;
         int mNumScreens;
+        boolean mCompletedInitialOffset;
 
         public WallpaperOffsetInterpolator() {
             mChoreographer = Choreographer.getInstance();
@@ -1391,7 +1392,8 @@ public class Workspace extends SmoothPagedView
         private void updateOffset(boolean force) {
             if (mWaitingForUpdate || force) {
                 mWaitingForUpdate = false;
-                if (computeScrollOffset() && mWindowToken != null) {
+                if ((!mCompletedInitialOffset || computeScrollOffset()) && mWindowToken != null) {
+                    mCompletedInitialOffset = true;
                     try {
                         mWallpaperManager.setWallpaperOffsets(mWindowToken,
                                 mWallpaperOffset.getCurrX(), 0.5f);
@@ -2306,9 +2308,6 @@ public class Workspace extends SmoothPagedView
             return null;
         }
 
-        // Check to see if new Settings need to be taken
-        reloadSettings();
-
         // Initialize animation arrays for the first time if necessary
         initAnimationArrays();
 
@@ -2338,6 +2337,11 @@ public class Workspace extends SmoothPagedView
         boolean allAppsToWorkspace = (stateIsNormalHidden && stateIsNormal);
         final boolean workspaceToOverview = (oldStateIsNormal && stateIsOverview);
         final boolean overviewToWorkspace = (oldStateIsOverview && stateIsNormal);
+
+        if (overviewToWorkspace || overviewToAllApps) {
+            // Check to see if new Settings need to be taken
+            reloadSettings();
+        }
 
         mNewScale = 1.0f;
 
@@ -2588,7 +2592,8 @@ public class Workspace extends SmoothPagedView
         }
         mLauncher.updateVoiceButtonProxyVisible(false);
 
-        if (stateIsNormal) {
+        if (stateIsNormal ||(mLauncher.getDrawerType() == AppDrawerListAdapter.DrawerType.Drawer &&
+                stateIsNormalHidden)) {
             animateBackgroundGradient(0f, animated);
         } else {
             animateBackgroundGradient(getResources().getInteger(

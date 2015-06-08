@@ -53,5 +53,14 @@
         <item>1</item>
         <item>2</item>
     </string-array>
+    <!-- Drawer type -->
+    <string-array name="drawer_type_entries" translatable="false">
+        <item>@string/drawer_type_drawer</item>
+        <item>@string/drawer_type_pager</item>
+    </string-array>
+    <string-array name="drawer_type_values" translatable="false">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
 
 </resources>

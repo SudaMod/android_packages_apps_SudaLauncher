@@ -1,6 +1,7 @@
 package org.namelessrom.perception;
 
 public class LauncherConfiguration {
+    public static boolean updateDrawerType;
     public static boolean updateDrawerTopBar;
     public static boolean updateDynamicGrid;
     public static boolean updateSortMode;

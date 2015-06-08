@@ -91,7 +91,7 @@ public class SavedWallpaperImages extends BaseAdapter implements ListAdapter {
             if (thumb != null) {
                 mImages.add(new SavedWallpaperTile(result.getInt(0),
                         new File(mContext.getFilesDir(), result.getString(2)),
-                        new BitmapDrawable(thumb)));
+                        new BitmapDrawable(mContext.getResources(), thumb)));
             }
         }
         result.close();

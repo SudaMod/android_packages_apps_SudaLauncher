@@ -54,7 +54,7 @@ public class InfoDropTarget extends ButtonDropTarget {
 
         if (mDrawable == null) {
             // TODO: investigate why this is ever happening. Presently only on one known device.
-            mDrawable = (TransitionDrawable) r.getDrawable(R.drawable.info_target_selector);
+            mDrawable = (TransitionDrawable) getContext().getDrawable(R.drawable.info_target_selector);
             setCompoundDrawablesRelativeWithIntrinsicBounds(mDrawable, null, null, null);
         }
 

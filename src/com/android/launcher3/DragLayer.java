@@ -104,12 +104,11 @@ public class DragLayer extends FrameLayout implements ViewGroup.OnHierarchyChang
         setChildrenDrawingOrderEnabled(true);
         setOnHierarchyChangeListener(this);
 
-        final Resources res = getResources();
-        mLeftHoverDrawable = res.getDrawable(R.drawable.page_hover_left);
-        mRightHoverDrawable = res.getDrawable(R.drawable.page_hover_right);
-        mLeftHoverDrawableActive = res.getDrawable(R.drawable.page_hover_left_active);
-        mRightHoverDrawableActive = res.getDrawable(R.drawable.page_hover_right_active);
-        mBackground = res.getDrawable(R.drawable.apps_customize_bg);
+        mLeftHoverDrawable = context.getDrawable(R.drawable.page_hover_left);
+        mRightHoverDrawable = context.getDrawable(R.drawable.page_hover_right);
+        mLeftHoverDrawableActive = context.getDrawable(R.drawable.page_hover_left_active);
+        mRightHoverDrawableActive = context.getDrawable(R.drawable.page_hover_right_active);
+        mBackground = context.getDrawable(R.drawable.apps_customize_bg);
     }
 
     public void setup(Launcher launcher, DragController controller) {
@@ -135,11 +134,32 @@ public class DragLayer extends FrameLayout implements ViewGroup.OnHierarchyChang
                 lp.bottomMargin += insets.bottom - mInsets.bottom;
                 layout.setLayoutParams(lp);
                 continue;
+            } else if (child.getId() == R.id.app_drawer_container) {
+                setAppDrawerInsets(child, insets);
+
+                continue;
             }
             setInsets(child, insets, mInsets);
         }
         mInsets.set(insets);
         return true; // I'll take it from here
+    }
+
+    private void setAppDrawerInsets(View child, Rect insets) {
+        // List view
+        View view = child.findViewById(R.id.app_drawer_recyclerview);
+        FrameLayout.LayoutParams lp =
+                (FrameLayout.LayoutParams) view.getLayoutParams();
+        int paddingBottom = view.getPaddingBottom() + insets.bottom - mInsets.bottom;
+        int paddingTop = view.getPaddingTop() + insets.top - mInsets.top;
+        view.setLayoutParams(lp);
+        view.setPadding(view.getPaddingLeft(), paddingTop, view.getPaddingRight(), paddingBottom);
+
+        // Scrubber
+        view = child.findViewById(R.id.app_drawer_scrubber_container);
+        LinearLayout.LayoutParams llp = (LinearLayout.LayoutParams) view.getLayoutParams();
+        llp.bottomMargin += insets.bottom - mInsets.bottom;
+        view.setLayoutParams(llp);
     }
 
     Rect getInsets() {

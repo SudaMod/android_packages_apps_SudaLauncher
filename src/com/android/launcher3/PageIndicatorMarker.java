@@ -50,9 +50,8 @@ public class PageIndicatorMarker extends FrameLayout {
     }
 
     void setMarkerDrawables(int activeResId, int inactiveResId) {
-        Resources r = getResources();
-        mActiveMarker.setImageDrawable(r.getDrawable(activeResId));
-        mInactiveMarker.setImageDrawable(r.getDrawable(inactiveResId));
+        mActiveMarker.setImageDrawable(getContext().getDrawable(activeResId));
+        mInactiveMarker.setImageDrawable(getContext().getDrawable(inactiveResId));
     }
 
     void activate(boolean immediate) {

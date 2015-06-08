@@ -30,6 +30,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.android.launcher3.AppDrawerListAdapter;
 import com.android.launcher3.R;
 import com.android.launcher3.settings.SettingsProvider;
 
@@ -60,6 +61,8 @@ public class LauncherPreferenceFragment extends PreferenceFragment implements Pr
     private SwitchPreference mStatusBarVisibility;
 
     // Drawer
+    private Preference mDrawerEffect;
+    private ListPreference mDrawerType;
     private ListPreference mSortMode;
     private SwitchPreference mHideTopBar;
 
@@ -89,6 +92,12 @@ public class LauncherPreferenceFragment extends PreferenceFragment implements Pr
         mStatusBarVisibility.setOnPreferenceChangeListener(this);
 
         // Drawer
+        mDrawerEffect = findPreference(KEY_SCROLL_EFFECT_DRAWER);
+
+        mDrawerType = (ListPreference) findPreference(SettingsProvider.SETTINGS_UI_DRAWER_TYPE);
+        mDrawerType.setSummary(mDrawerType.getEntry());
+        mDrawerType.setOnPreferenceChangeListener(this);
+
         mSortMode = (ListPreference) findPreference(SettingsProvider.SETTINGS_UI_DRAWER_SORT_MODE);
         mSortMode.setSummary(mSortMode.getEntry());
         mSortMode.setOnPreferenceChangeListener(this);
@@ -96,11 +105,37 @@ public class LauncherPreferenceFragment extends PreferenceFragment implements Pr
         mHideTopBar =
                 (SwitchPreference) findPreference(SettingsProvider.SETTINGS_UI_DRAWER_HIDE_TOP_BAR);
         mHideTopBar.setOnPreferenceChangeListener(this);
+
+        updateDrawerPreferences(mDrawerType.getValue());
+    }
+
+    private void updateDrawerPreferences(String value) {
+        int drawerType;
+        try {
+            drawerType = Integer.parseInt(value);
+        } catch (NumberFormatException nfe) {
+            drawerType = 0;
+        }
+
+        final boolean isDrawer = (drawerType == AppDrawerListAdapter.DrawerType.Drawer.getValue());
+
+        mDrawerEffect.setEnabled(!isDrawer);
+        mSortMode.setEnabled(!isDrawer);
+        mHideTopBar.setEnabled(!isDrawer);
     }
 
     @Override
     public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
+        if (preference == mDrawerEffect) {
+            mListener.onTransitionEffectFragment(true);
+            return true;
+        }
+
         final String key = preference.getKey();
+        if (key == null || key.isEmpty()) {
+            return super.onPreferenceTreeClick(preferenceScreen, preference);
+        }
+
         if (KEY_ICON_PACK.equals(key)) {
             IconPackHelper.get(getActivity()).pickIconPack(getActivity());
         } else if (KEY_PROTECTED_APPS.equals(key)) {
@@ -116,8 +151,6 @@ public class LauncherPreferenceFragment extends PreferenceFragment implements Pr
             mListener.onGestureFragment();
         } else if (KEY_GRID_SIZE.equals(key)) {
             mListener.onDynamicGridSizeFragment();
-        } else if (KEY_SCROLL_EFFECT_DRAWER.equals(key)) {
-            mListener.onTransitionEffectFragment(true);
         } else if (KEY_SCROLL_EFFECT_HOME.equals(key)) {
             mListener.onTransitionEffectFragment(false);
         } else if (key.contains(PREFIX_HOME_SCREEN) || key.contains(PREFIX_GENERAL)) {
@@ -135,6 +168,10 @@ public class LauncherPreferenceFragment extends PreferenceFragment implements Pr
             preference.setSummary(((ListPreference) preference).getEntries()[index]);
             if (mSortMode == preference) {
                 LauncherConfiguration.updateSortMode = true;
+            }
+            if (mDrawerType == preference) {
+                updateDrawerPreferences(value);
+                LauncherConfiguration.updateDrawerType = true;
             }
             return true;
         } else if (mStatusBarVisibility == preference) {

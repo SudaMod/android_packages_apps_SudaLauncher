@@ -81,9 +81,10 @@ public class DeleteDropTarget extends ButtonDropTarget {
         // Get the hover color
         Resources r = getResources();
         mHoverColor = r.getColor(R.color.delete_target_hover_tint);
-        mUninstallDrawable = (TransitionDrawable) 
-                r.getDrawable(R.drawable.uninstall_target_selector);
-        mRemoveDrawable = (TransitionDrawable) r.getDrawable(R.drawable.remove_target_selector);
+        mUninstallDrawable = (TransitionDrawable)
+                getContext().getDrawable(R.drawable.uninstall_target_selector);
+        mRemoveDrawable = (TransitionDrawable)
+                getContext().getDrawable(R.drawable.remove_target_selector);
 
         mRemoveDrawable.setCrossFadeEnabled(true);
         mUninstallDrawable.setCrossFadeEnabled(true);

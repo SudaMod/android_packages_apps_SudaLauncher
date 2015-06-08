@@ -210,11 +210,11 @@ public class CellLayout extends ViewGroup {
         final Resources res = getResources();
         mHotseatScale = (float) grid.hotseatIconSizePx / grid.iconSizePx;
 
-        mNormalBackground = res.getDrawable(R.drawable.screenpanel);
-        mActiveGlowBackground = res.getDrawable(R.drawable.screenpanel_hover);
+        mNormalBackground = context.getDrawable(R.drawable.screenpanel);
+        mActiveGlowBackground = context.getDrawable(R.drawable.screenpanel_hover);
 
-        mOverScrollLeft = res.getDrawable(R.drawable.overscroll_glow_left);
-        mOverScrollRight = res.getDrawable(R.drawable.overscroll_glow_right);
+        mOverScrollLeft = context.getDrawable(R.drawable.overscroll_glow_left);
+        mOverScrollRight = context.getDrawable(R.drawable.overscroll_glow_right);
         mForegroundPadding =
                 res.getDimensionPixelSize(R.dimen.workspace_overscroll_drawable_padding);
 
