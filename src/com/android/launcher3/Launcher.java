@@ -154,6 +154,7 @@ public class Launcher extends Activity
     DeviceProfile mGrid;
 
     static final boolean PROFILE_STARTUP = false;
+    static final boolean DEBUG = false;
     static final boolean DEBUG_WIDGETS = false;
     static final boolean DEBUG_STRICT_MODE = false;
     static final boolean DEBUG_RESUME_TIME = false;
@@ -2354,7 +2355,16 @@ public class Launcher extends Activity
         if (requestCode >= 0) {
             setWaitingForResult(true);
         }
-        super.startActivityForResult(intent, requestCode);
+        this.startActivityForResult(intent, requestCode, null);
+    }
+
+    @Override
+    public void startActivityForResult(Intent intent, int requestCode, Bundle options) {
+        if (DEBUG) {
+            Log.d(TAG, String.format("Starting activity with boost: %s", intent));
+        }
+        getPowerManager().cpuBoost(750000);
+        super.startActivityForResult(intent, requestCode, options);
     }
 
     /**
