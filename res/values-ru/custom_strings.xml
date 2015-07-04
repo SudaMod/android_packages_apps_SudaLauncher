@@ -18,6 +18,7 @@
 <resources>
   <string name="preferences_text">Настройки</string>
   <string name="gesture_settings">Жесты</string>
+  <string name="gesture_summary">Задать различные действия для жестов</string>
   <string name="gesture_choose">Выбрать действие</string>
   <string name="gesture_swipe_down">Свайп вниз</string>
   <string name="gesture_swipe_up">Свайп вверх</string>
@@ -43,5 +44,23 @@
   <string name="landscape">Горизонтальная ориентация</string>
   <string name="landscape_reverse">Альбомная ориентация (вверх ногами)</string>
   <string name="hide_status_bar_title">Скрыть строку состояния</string>
+  <string name="hide_icon_labels">Скрыть подписи значков</string>
+  <string name="hide_icon_labels_drawer_summary">Удаляет подписи иконок приложений в меню приложений</string>
+  <string name="hide_icon_labels_home_summary">Удаляет подписи иконок приложений на домашнем экране</string>
+  <string name="show_search_bar">Показать панель поиска</string>
+  <string name="show_search_bar_summary">Показывает панель поиска на домашнем экране, если установлен Google Now</string>
+  <string name="scrolling_wallpaper_summary">Прокручивает обои вместе c домашними экранами</string>
+  <string name="scroll_effect_drawer_summary">Настроить эффект при прокрутке в меню приложений</string>
+  <string name="scroll_effect_home_summary">Настроить эффект при прокрутке домашних экранов</string>
+  <string name="grid_size_summary">Настройте размер сетки домашнего экрана</string>
+  <string name="protected_app_summary">Настроить защищенные приложения</string>
   <string name="no_last_app">Последнее приложение не найдено!</string>
+  <string name="hide_apps_top_bar">Спрятать верхнюю панель</string>
+  <string name="hide_apps_top_bar_summary">Верхняя панель, содержащая элементы строки поиска</string>
+  <string name="icon_pack_title">Наборы значков</string>
+  <string name="icon_pack_summary">Восстановление набора иконок по умолчанию</string>
+  <string name="no_iconpacks_summary">Наборы значков не установлены</string>
+  <string name="default_icon_pack_title">Системные иконки</string>
+  <string name="dialog_pick_icon_pack_title">Выберите набор иконок</string>
+  <string name="hint_filter_apps">Фильтр приложений...</string>
 </resources>
