@@ -341,6 +341,8 @@ public class Launcher extends Activity
     private boolean mHasFocus = false;
     private boolean mAttached = false;
 
+    private boolean mShouldShowVoice = false;
+
     private static LocaleConfiguration sLocaleConfiguration = null;
 
     private static HashMap<Long, FolderInfo> sFolders = new HashMap<Long, FolderInfo>();
@@ -4515,6 +4517,7 @@ public class Launcher extends Activity
             if (voiceButtonContainer != null) voiceButtonContainer.setVisibility(View.GONE);
             if (searchButton != null) searchButton.setVisibility(View.GONE);
             if (voiceButton != null) voiceButton.setVisibility(View.GONE);
+            mShouldShowVoice = false;
             updateVoiceButtonProxyVisible(true);
             return false;
         }
@@ -4564,10 +4567,12 @@ public class Launcher extends Activity
             voiceButton.setVisibility(View.VISIBLE);
             updateVoiceButtonProxyVisible(false);
             invalidatePressedFocusedStates(voiceButtonContainer, voiceButton);
+            mShouldShowVoice = true;
             return true;
         } else {
             if (voiceButtonContainer != null) voiceButtonContainer.setVisibility(View.GONE);
             if (voiceButton != null) voiceButton.setVisibility(View.GONE);
+            mShouldShowVoice = false;
             updateVoiceButtonProxyVisible(true);
             return false;
         }
@@ -4584,7 +4589,7 @@ public class Launcher extends Activity
         final View voiceButtonProxy = findViewById(R.id.voice_button_proxy);
         if (voiceButtonProxy != null) {
             boolean visible = !forceDisableVoiceButtonProxy &&
-                    mWorkspace.shouldVoiceButtonProxyBeVisible();
+                    mWorkspace.shouldVoiceButtonProxyBeVisible() && mShouldShowVoice;
             voiceButtonProxy.setVisibility(visible ? View.VISIBLE : View.GONE);
             voiceButtonProxy.bringToFront();
         }
