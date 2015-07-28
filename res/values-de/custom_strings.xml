@@ -55,4 +55,10 @@
   <string name="grid_size_summary">Konfigurieren Sie die Rastergröße des Startbildschirms</string>
   <string name="protected_app_summary">Konfigurieren von geschützten Apps</string>
   <string name="no_last_app">Keine vorherige App gefunden!</string>
+  <string name="icon_pack_title">Symbolpakete</string>
+  <string name="icon_pack_summary">Symbolpakete ersetzen die Standard-Anwendungsymbole</string>
+  <string name="no_iconpacks_summary">Keine Symbolpakete vorhanden</string>
+  <string name="default_icon_pack_title">System-Symbole</string>
+  <string name="dialog_pick_icon_pack_title">Symbolpaket auswählen</string>
+  <string name="hint_filter_apps">Apps filtern&#8230;</string>
 </resources>

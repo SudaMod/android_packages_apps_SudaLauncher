@@ -341,6 +341,8 @@ public class Launcher extends Activity
     private boolean mHasFocus = false;
     private boolean mAttached = false;
 
+    private boolean mShouldShowVoice = false;
+
     private static LocaleConfiguration sLocaleConfiguration = null;
 
     private static HashMap<Long, FolderInfo> sFolders = new HashMap<Long, FolderInfo>();
@@ -2990,11 +2992,15 @@ public class Launcher extends Activity
         final Intent intent;
         if (tag instanceof ShortcutInfo) {
             shortcut = (ShortcutInfo) tag;
+            if (shortcut.isDisabled) {
+                Toast.makeText(this, R.string.app_not_available, Toast.LENGTH_SHORT).show();
+                return;
+            }
             intent = shortcut.intent;
             int[] pos = new int[2];
             v.getLocationOnScreen(pos);
-            intent.setSourceBounds(new Rect(pos[0], pos[1],
-                    pos[0] + v.getWidth(), pos[1] + v.getHeight()));
+            intent.setSourceBounds(
+                    new Rect(pos[0], pos[1], pos[0] + v.getWidth(), pos[1] + v.getHeight()));
 
         } else if (tag instanceof AppInfo) {
             shortcut = null;
@@ -4515,6 +4521,7 @@ public class Launcher extends Activity
             if (voiceButtonContainer != null) voiceButtonContainer.setVisibility(View.GONE);
             if (searchButton != null) searchButton.setVisibility(View.GONE);
             if (voiceButton != null) voiceButton.setVisibility(View.GONE);
+            mShouldShowVoice = false;
             updateVoiceButtonProxyVisible(true);
             return false;
         }
@@ -4564,10 +4571,12 @@ public class Launcher extends Activity
             voiceButton.setVisibility(View.VISIBLE);
             updateVoiceButtonProxyVisible(false);
             invalidatePressedFocusedStates(voiceButtonContainer, voiceButton);
+            mShouldShowVoice = true;
             return true;
         } else {
             if (voiceButtonContainer != null) voiceButtonContainer.setVisibility(View.GONE);
             if (voiceButton != null) voiceButton.setVisibility(View.GONE);
+            mShouldShowVoice = false;
             updateVoiceButtonProxyVisible(true);
             return false;
         }
@@ -4584,7 +4593,7 @@ public class Launcher extends Activity
         final View voiceButtonProxy = findViewById(R.id.voice_button_proxy);
         if (voiceButtonProxy != null) {
             boolean visible = !forceDisableVoiceButtonProxy &&
-                    mWorkspace.shouldVoiceButtonProxyBeVisible();
+                    mWorkspace.shouldVoiceButtonProxyBeVisible() && mShouldShowVoice;
             voiceButtonProxy.setVisibility(visible ? View.VISIBLE : View.GONE);
             voiceButtonProxy.bringToFront();
         }
@@ -5334,6 +5343,38 @@ public class Launcher extends Activity
                 mAppsCustomizeContent != null) {
             mAppsCustomizeContent.removeApps(appInfos);
             mAppDrawerAdapter.removeApps(appInfos);
+        }
+    }
+
+    /**
+     * A package has become unavailable.
+     *
+     * Implementation of the method from LauncherModel.Callbacks.
+     */
+    public void bindComponentsUnavailable(final ArrayList<String> packageNames,
+            final ArrayList<AppInfo> appInfos) {
+        if (!packageNames.isEmpty()) {
+            mWorkspace.updateUnavailableItemsByPackageName(packageNames);
+        }
+        // Notify the drag controller
+        mDragController.onAppsRemoved(packageNames, appInfos);
+
+        // Update AllApps
+        if (!LauncherAppState.isDisableAllApps() &&
+                mAppsCustomizeContent != null) {
+            mAppsCustomizeContent.removeApps(appInfos);
+            mAppDrawerAdapter.removeApps(appInfos);
+        }
+    }
+
+    /**
+     * A package has become unavailable.
+     *
+     * Implementation of the method from LauncherModel.Callbacks.
+     */
+    public void bindComponentsAvailable(final ArrayList<ItemInfo> itemInfos) {
+        if (!itemInfos.isEmpty()) {
+            mWorkspace.updateAvailableItems(itemInfos);
         }
     }
 
