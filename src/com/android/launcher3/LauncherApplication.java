@@ -22,15 +22,20 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class LauncherApplication extends Application {
     public static boolean LAUNCHER_SHOW_UNREAD_NUMBER;
 
     private static LauncherApplication sInstance;
 
     private String mStkAppName = new String();
+    Map<String,String> mStkMsimNames = new HashMap<String, String>();
     private final String STK_PACKAGE_INTENT_ACTION_NAME =
             "org.codeaurora.carrier.ACTION_TELEPHONY_SEND_STK_TITLE";
     private final String STK_APP_NAME = "StkTitle";
+    private final String STK_ACTIVITY_NAME = "StkActivity";
 
 
     @Override
@@ -59,11 +64,13 @@ public class LauncherApplication extends Application {
         @Override
         public void onReceive(Context context, Intent intent) {
             mStkAppName = intent.getStringExtra(STK_APP_NAME);
+            if (intent.getStringExtra(STK_ACTIVITY_NAME) != null)
+                mStkMsimNames.put(intent.getStringExtra(STK_ACTIVITY_NAME),mStkAppName);
         }
     };
 
-    public String getStkAppName(){
-        return mStkAppName;
+    public String getStkAppName(String activityName){
+        return mStkMsimNames.get(activityName) != null ? mStkMsimNames.get(activityName) : mStkAppName;
     }
 
     @Override
