@@ -61,6 +61,7 @@ public class IconCache {
 
     private static final int INITIAL_ICON_CACHE_CAPACITY = 50;
     private static final String RESOURCE_FILE_PREFIX = "icon_";
+    private final String STK_PACKAGE_NAME = "com.android.stk";
 
     // Empty class name is used for storing package default entry.
     private static final String EMPTY_CLASS_NAME = ".";
@@ -365,6 +366,22 @@ public class IconCache {
             boolean usePackageIcon, int unreadNum) {
         CacheKey cacheKey = new CacheKey(componentName, user);
         CacheEntry entry = mCache.get(cacheKey);
+
+        boolean isCustomTitle = false;
+        String activity = null;
+        if (info != null) {
+            boolean condition = (mContext.getResources().
+                    getBoolean(R.bool.config_launcher_stkAppRename))
+                    && info.getComponentName().getPackageName().toString()
+                            .equalsIgnoreCase(STK_PACKAGE_NAME);
+            activity = info.getComponentName().getClassName().toString();
+
+            if (condition
+                    && !TextUtils.isEmpty(((LauncherApplication) mContext)
+                            .getStkAppName(activity))) {
+                isCustomTitle = true;
+            }
+        }
         if (entry == null || unreadNum >= 0) {
             entry = new CacheEntry();
 
@@ -373,9 +390,19 @@ public class IconCache {
             if (info != null) {
                 ComponentName labelKey = info.getComponentName();
                 if (labelCache != null && labelCache.containsKey(labelKey)) {
-                    entry.title = labelCache.get(labelKey).toString();
+                    if (isCustomTitle) {
+                        entry.title = ((LauncherApplication) mContext)
+                                .getStkAppName(activity);
+                    } else {
+                        entry.title = labelCache.get(labelKey).toString();
+                    }
                 } else {
-                    entry.title = info.getLabel().toString();
+                    if (isCustomTitle) {
+                        entry.title = ((LauncherApplication) mContext)
+                                .getStkAppName(activity);
+                    } else {
+                        entry.title = info.getLabel().toString();
+                    }
                     if (labelCache != null) {
                         labelCache.put(labelKey, entry.title);
                     }
