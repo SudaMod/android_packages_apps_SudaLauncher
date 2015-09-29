@@ -825,11 +825,13 @@ public class DeviceProfile {
 
         // Layout the search bar
         View qsbBar = launcher.getQsbBar();
-        qsbBar.setVisibility(searchBarVisible ? View.VISIBLE : View.GONE);
-        LayoutParams vglp = qsbBar.getLayoutParams();
-        vglp.width = LayoutParams.MATCH_PARENT;
-        vglp.height = LayoutParams.MATCH_PARENT;
-        qsbBar.setLayoutParams(vglp);
+        if (qsbBar != null) {
+            qsbBar.setVisibility(searchBarVisible ? View.VISIBLE : View.GONE);
+            LayoutParams vglp = qsbBar.getLayoutParams();
+            vglp.width = LayoutParams.MATCH_PARENT;
+            vglp.height = LayoutParams.MATCH_PARENT;
+            qsbBar.setLayoutParams(vglp);
+        }
 
         // Layout the voice proxy
         View voiceButtonProxy = launcher.findViewById(R.id.voice_button_proxy);
