@@ -214,7 +214,7 @@ public class SearchDropTargetBar extends FrameLayout implements DragController.D
         // Animate out the QSB search bar, and animate in the drop target bar
         prepareStartAnimation(mDropTargetBar);
         mDropTargetBarAnim.start();
-        if (!mIsSearchBarHidden || mQSBSearchBar.getAlpha() > 0f) {
+        if (!mIsSearchBarHidden || (mQSBSearchBar != null && mQSBSearchBar.getAlpha() > 0f)) {
             prepareStartAnimation(mQSBSearchBar);
             mQSBSearchBarAnim.start();
         }
@@ -230,7 +230,7 @@ public class SearchDropTargetBar extends FrameLayout implements DragController.D
             // Restore the QSB search bar, and animate out the drop target bar
             prepareStartAnimation(mDropTargetBar);
             mDropTargetBarAnim.reverse();
-            if (!mIsSearchBarHidden || mQSBSearchBar.getAlpha() < 1f) {
+            if (!mIsSearchBarHidden || (mQSBSearchBar != null && mQSBSearchBar.getAlpha() < 1f)) {
                 prepareStartAnimation(mQSBSearchBar);
                 mQSBSearchBarAnim.reverse();
             }
