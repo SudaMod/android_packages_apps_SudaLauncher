@@ -5160,10 +5160,7 @@ public class Launcher extends Activity
             mQsb = null;
         }
         mSearchDropTargetBar.setQsbSearchBar(getQsbBar());
-        if (mDragController.isDragging()) {
-            mDragController.cancelDrag();
-        }
-        updateDynamicGrid(false);
+        mGrid.layoutSearchBar(this);
     }
 
     /**
