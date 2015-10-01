@@ -33,7 +33,7 @@ import java.util.Map;
 
 public class IconPackHelper {
     private static final String TAG = "IconPackHelper";
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
 
     public static final String KEY_ICON_PACK = "key_icon_pack";
 
