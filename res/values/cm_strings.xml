@@ -84,6 +84,6 @@
 
     <string name="setting_state_disabled">DISABLED</string>
 
-    <!-- App not available toast text -->
-    <string name="app_not_available">App not available</string>
+    <!-- Search Manager doesn't exist -->
+    <string name="search_activity_not_found">A search activity could not be found!</string>
 </resources>

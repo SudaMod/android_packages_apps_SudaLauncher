@@ -30,6 +30,7 @@ import android.content.Intent;
 import android.content.Intent.ShortcutIconResource;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.LauncherApps.Callback;
 import android.content.pm.PackageManager;
 import android.content.pm.ProviderInfo;
 import android.content.pm.ResolveInfo;
@@ -77,7 +78,6 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Maintains in-memory state of the Launcher. It is expected that there should be only one
@@ -89,6 +89,7 @@ public class LauncherModel extends BroadcastReceiver
     static final boolean DEBUG_LOADERS = false;
     private static final boolean DEBUG_RECEIVER = false;
     private static final boolean REMOVE_UNRESTORED_ICONS = true;
+    private static final boolean ADD_MANAGED_PROFILE_SHORTCUTS = false;
 
     static final String TAG = "Launcher.Model";
     public static final String SETTINGS_PROTECTED_COMPONENTS = "protected_components";
@@ -110,6 +111,11 @@ public class LauncherModel extends BroadcastReceiver
     private LoaderTask mLoaderTask;
     private boolean mIsLoaderTaskRunning;
     private volatile boolean mFlushingWorkerThread;
+
+    /**
+     * Maintain a set of packages per user, for which we added a shortcut on the workspace.
+     */
+    private static final String INSTALLED_SHORTCUTS_SET_PREFIX = "installed_shortcuts_set_for_user_";
 
     // Specific runnable types that are run on the main thread deferred handler, this allows us to
     // clear all queued binding runnables when the Launcher activity is destroyed.
@@ -201,13 +207,13 @@ public class LauncherModel extends BroadcastReceiver
                                   ArrayList<AppInfo> addedApps);
         public void bindAppsUpdated(ArrayList<AppInfo> apps);
         public void bindAppsRestored(ArrayList<AppInfo> apps);
+        public void bindShortcutsChanged(ArrayList<ShortcutInfo> updated,
+                ArrayList<ShortcutInfo> removed, UserHandleCompat user);
+        public void bindWidgetsRestored(ArrayList<LauncherAppWidgetInfo> widgets);
         public void updatePackageState(ArrayList<PackageInstallInfo> installInfo);
         public void updatePackageBadge(String packageName);
         public void bindComponentsRemoved(ArrayList<String> packageNames,
-                        ArrayList<AppInfo> appInfos, UserHandleCompat user);
-        public void bindComponentsUnavailable(ArrayList<String> packageNames,
-                ArrayList<AppInfo> appInfos);
-        public void bindComponentsAvailable(ArrayList<ItemInfo> itemInfos);
+                        ArrayList<AppInfo> appInfos, UserHandleCompat user, int reason);
         public void bindPackagesUpdated(ArrayList<Object> widgetsAndShortcuts);
         public void bindSearchablesChanged();
         public boolean isAllAppsButtonRank(int rank);
@@ -379,7 +385,7 @@ public class LauncherModel extends BroadcastReceiver
         // Process the updated package state
         Runnable r = new Runnable() {
             public void run() {
-                Callbacks callbacks = mCallbacks != null ? mCallbacks.get() : null;
+                Callbacks callbacks = getCallback();
                 if (callbacks != null) {
                     callbacks.updatePackageState(installInfo);
                 }
@@ -392,7 +398,7 @@ public class LauncherModel extends BroadcastReceiver
         // Process the updated package badge
         Runnable r = new Runnable() {
             public void run() {
-                Callbacks callbacks = mCallbacks != null ? mCallbacks.get() : null;
+                Callbacks callbacks = getCallback();
                 if (callbacks != null) {
                     callbacks.updatePackageBadge(packageName);
                 }
@@ -402,7 +408,7 @@ public class LauncherModel extends BroadcastReceiver
     }
 
     public void addAppsToAllApps(final Context ctx, final ArrayList<AppInfo> allAppsApps) {
-        final Callbacks callbacks = mCallbacks != null ? mCallbacks.get() : null;
+        final Callbacks callbacks = getCallback();
 
         if (allAppsApps == null) {
             throw new RuntimeException("allAppsApps must not be null");
@@ -411,32 +417,13 @@ public class LauncherModel extends BroadcastReceiver
             return;
         }
 
-        final ArrayList<AppInfo> restoredAppsFinal = new ArrayList<AppInfo>();
-        Iterator<AppInfo> iter = allAppsApps.iterator();
-        while (iter.hasNext()) {
-            ItemInfo a = iter.next();
-            if (LauncherModel.appWasPromise(ctx, a.getIntent(), a.user)) {
-                restoredAppsFinal.add((AppInfo) a);
-            }
-        }
-
         // Process the newly added applications and add them to the database first
         Runnable r = new Runnable() {
             public void run() {
                 runOnMainThread(new Runnable() {
                     public void run() {
-                        Callbacks cb = mCallbacks != null ? mCallbacks.get() : null;
+                        Callbacks cb = getCallback();
                         if (callbacks == cb && cb != null) {
-                            if (!restoredAppsFinal.isEmpty()) {
-                                for (AppInfo info : restoredAppsFinal) {
-                                    final Intent intent = info.getIntent();
-                                    if (intent != null) {
-                                        mIconCache.deletePreloadedIcon(intent.getComponent(),
-                                                info.user);
-                                    }
-                                }
-                                callbacks.bindAppsUpdated(restoredAppsFinal);
-                            }
                             callbacks.bindAppsAdded(null, null, null, allAppsApps);
                         }
                     }
@@ -448,7 +435,7 @@ public class LauncherModel extends BroadcastReceiver
 
     public void addAndBindAddedWorkspaceApps(final Context context,
             final ArrayList<ItemInfo> workspaceApps) {
-        final Callbacks callbacks = mCallbacks != null ? mCallbacks.get() : null;
+        final Callbacks callbacks = getCallback();
 
         if (workspaceApps == null) {
             throw new RuntimeException("workspaceApps and allAppsApps must not be null");
@@ -461,7 +448,6 @@ public class LauncherModel extends BroadcastReceiver
             public void run() {
                 final ArrayList<ItemInfo> addedShortcutsFinal = new ArrayList<ItemInfo>();
                 final ArrayList<Long> addedWorkspaceScreensFinal = new ArrayList<Long>();
-                final ArrayList<AppInfo> restoredAppsFinal = new ArrayList<AppInfo>();
 
                 // Get the list of workspace screens.  We need to append to this list and
                 // can not use sBgWorkspaceScreens because loadWorkspace() may not have been
@@ -481,12 +467,7 @@ public class LauncherModel extends BroadcastReceiver
                         final Intent launchIntent = a.getIntent();
 
                         // Short-circuit this logic if the icon exists somewhere on the workspace
-                        if (LauncherModel.shortcutExists(context, name, launchIntent)) {
-                            // Only InstallShortcutReceiver sends us shortcutInfos, ignore them
-                            if (a instanceof AppInfo &&
-                                    LauncherModel.appWasPromise(context, launchIntent, a.user)) {
-                                restoredAppsFinal.add((AppInfo) a);
-                            }
+                        if (shortcutExists(context, name, launchIntent, a.user)) {
                             continue;
                         }
 
@@ -545,7 +526,7 @@ public class LauncherModel extends BroadcastReceiver
                 if (!addedShortcutsFinal.isEmpty()) {
                     runOnMainThread(new Runnable() {
                         public void run() {
-                            Callbacks cb = mCallbacks != null ? mCallbacks.get() : null;
+                            Callbacks cb = getCallback();
                             if (callbacks == cb && cb != null) {
                                 final ArrayList<ItemInfo> addAnimated = new ArrayList<ItemInfo>();
                                 final ArrayList<ItemInfo> addNotAnimated = new ArrayList<ItemInfo>();
@@ -562,9 +543,6 @@ public class LauncherModel extends BroadcastReceiver
                                 }
                                 callbacks.bindAppsAdded(addedWorkspaceScreensFinal,
                                         addNotAnimated, addAnimated, null);
-                                if (!restoredAppsFinal.isEmpty()) {
-                                    callbacks.bindAppsUpdated(restoredAppsFinal);
-                                }
                             }
                         }
                     });
@@ -908,7 +886,8 @@ public class LauncherModel extends BroadcastReceiver
      * Returns true if the shortcuts already exists in the database.
      * we identify a shortcut by its title and intent.
      */
-    static boolean shortcutExists(Context context, String title, Intent intent) {
+    static boolean shortcutExists(Context context, String title, Intent intent,
+            UserHandleCompat user) {
         final ContentResolver cr = context.getContentResolver();
         final Intent intentWithPkg, intentWithoutPkg;
 
@@ -927,27 +906,18 @@ public class LauncherModel extends BroadcastReceiver
             intentWithPkg = intent;
             intentWithoutPkg = intent;
         }
+        String userSerial = Long.toString(UserManagerCompat.getInstance(context)
+                .getSerialNumberForUser(user));
         Cursor c = cr.query(LauncherSettings.Favorites.CONTENT_URI,
-            new String[] { "title", "intent" }, "title=? and (intent=? or intent=?)",
-            new String[] { title, intentWithPkg.toUri(0), intentWithoutPkg.toUri(0) }, null);
-        boolean result = false;
+            new String[] { "title", "intent", "profileId" },
+            "title=? and (intent=? or intent=?) and profileId=?",
+            new String[] { title, intentWithPkg.toUri(0), intentWithoutPkg.toUri(0), userSerial },
+            null);
         try {
-            result = c.moveToFirst();
+            return c.moveToFirst();
         } finally {
             c.close();
         }
-        return result;
-    }
-
-    /**
-     * Returns true if the promise shortcuts with the same package name exists on the workspace.
-     */
-    static boolean appWasPromise(Context context, Intent intent, UserHandleCompat user) {
-        final ComponentName component = intent.getComponent();
-        if (component == null) {
-            return false;
-        }
-        return !getItemsByPackageName(component.getPackageName(), user).isEmpty();
     }
 
     /**
@@ -1151,7 +1121,7 @@ public class LauncherModel extends BroadcastReceiver
      * @param context
      * @param item
      */
-    static void deleteItemsFromDatabase(Context context, final ArrayList<ItemInfo> items) {
+    static void deleteItemsFromDatabase(Context context, final ArrayList<? extends ItemInfo> items) {
         final ContentResolver cr = context.getContentResolver();
 
         Runnable r = new Runnable() {
@@ -1362,11 +1332,9 @@ public class LauncherModel extends BroadcastReceiver
              mPreviousConfigMcc = currentConfig.mcc;
         } else if (SearchManager.INTENT_GLOBAL_SEARCH_ACTIVITY_CHANGED.equals(action) ||
                    SearchManager.INTENT_ACTION_SEARCHABLES_CHANGED.equals(action)) {
-            if (mCallbacks != null) {
-                Callbacks callbacks = mCallbacks.get();
-                if (callbacks != null) {
-                    callbacks.bindSearchablesChanged();
-                }
+            Callbacks callbacks = getCallback();
+            if (callbacks != null) {
+                callbacks.bindSearchablesChanged();
             }
         } else if (ACTION_UNREAD_CHANGED.equals(action)) {
             ComponentName componentName = intent.getParcelableExtra("component_name");
@@ -1408,13 +1376,11 @@ public class LauncherModel extends BroadcastReceiver
      */
     public void startLoaderFromBackground() {
         boolean runLoader = false;
-        if (mCallbacks != null) {
-            Callbacks callbacks = mCallbacks.get();
-            if (callbacks != null) {
-                // Only actually run the loader if they're not paused.
-                if (!callbacks.setLoadOnResume()) {
-                    runLoader = true;
-                }
+        Callbacks callbacks = getCallback();
+        if (callbacks != null) {
+            // Only actually run the loader if they're not paused.
+            if (!callbacks.setLoadOnResume()) {
+                runLoader = true;
             }
         }
         if (runLoader) {
@@ -1808,8 +1774,7 @@ public class LauncherModel extends BroadcastReceiver
         }
 
         // check & update map of what's occupied; used to discard overlapping/invalid items
-        private boolean checkItemPlacement(HashMap<Long, ItemInfo[][]> occupied, ItemInfo item,
-                                           AtomicBoolean deleteOnInvalidPlacement) {
+        private boolean checkItemPlacement(HashMap<Long, ItemInfo[][]> occupied, ItemInfo item) {
             LauncherAppState app = LauncherAppState.getInstance();
             DeviceProfile grid = app.getDynamicGrid().getDeviceProfile();
             final int countX = (int) grid.numColumns;
@@ -1820,7 +1785,6 @@ public class LauncherModel extends BroadcastReceiver
                 // Return early if we detect that an item is under the hotseat button
                 if (mCallbacks == null || mCallbacks.get() == null ||
                         mCallbacks.get().isAllAppsButtonRank((int) item.screenId)) {
-                    deleteOnInvalidPlacement.set(true);
                     Log.e(TAG, "Error loading shortcut into hotseat " + item
                             + " into position (" + item.screenId + ":" + item.cellX + ","
                             + item.cellY + ") occupied by all apps");
@@ -1877,7 +1841,6 @@ public class LauncherModel extends BroadcastReceiver
                 } else {
                     // see if widget can be shrunk to fit a screen, if not, just remove it
                     if (item.minSpanX > countX || item.minSpanY > countY) {
-                        deleteOnInvalidPlacement.set(true);
                         return false;
                     }
                     // if the widget is larger than the grid, shrink it down
@@ -2090,7 +2053,6 @@ public class LauncherModel extends BroadcastReceiver
                     UserHandleCompat user;
 
                     while (!mStopped && c.moveToNext()) {
-                        AtomicBoolean deleteOnInvalidPlacement = new AtomicBoolean(false);
                         try {
                             int itemType = c.getInt(itemTypeIndex);
                             boolean restored = 0 != c.getInt(restoredIndex);
@@ -2104,6 +2066,7 @@ public class LauncherModel extends BroadcastReceiver
                                 long serialNumber = c.getInt(profileIdIndex);
                                 user = mUserManager.getUserForSerialNumber(serialNumber);
                                 int promiseType = c.getInt(restoredIndex);
+                                int disabledState = 0;
                                 if (user == null) {
                                     // User has been deleted remove the item.
                                     itemsToRemove.add(id);
@@ -2177,14 +2140,13 @@ public class LauncherModel extends BroadcastReceiver
                                                 itemsToRemove.add(id);
                                                 continue;
                                             }
-                                        } else if (isSdCardReady) {
-                                            // Do not wait for external media load anymore.
-                                            // Log the invalid package, and remove it
-                                            Launcher.addDumpLog(TAG,
-                                                    "Invalid package removed: " + cn, true);
-                                            itemsToRemove.add(id);
-                                            continue;
-                                        } else {
+                                        } else if (launcherApps.isAppEnabled(
+                                                manager, cn.getPackageName(),
+                                                PackageManager.GET_UNINSTALLED_PACKAGES)) {
+                                            // Package is present but not available.
+                                            allowMissingTarget = true;
+                                            disabledState = ShortcutInfo.FLAG_DISABLED_NOT_AVAILABLE;
+                                        } else if (!isSdCardReady) {
                                             // SdCard is not ready yet. Package might get available,
                                             // once it is ready.
                                             Launcher.addDumpLog(TAG, "Invalid package: " + cn
@@ -2197,6 +2159,14 @@ public class LauncherModel extends BroadcastReceiver
                                             pkgs.add(cn.getPackageName());
                                             allowMissingTarget = true;
                                             // Add the icon on the workspace anyway.
+
+                                        } else {
+                                            // Do not wait for external media load anymore.
+                                            // Log the invalid package, and remove it
+                                            Launcher.addDumpLog(TAG,
+                                                    "Invalid package removed: " + cn, true);
+                                            itemsToRemove.add(id);
+                                            continue;
                                         }
                                     } else if (cn == null) {
                                         // For shortcuts with no component, keep them as they are
@@ -2254,15 +2224,14 @@ public class LauncherModel extends BroadcastReceiver
                                     info.spanX = 1;
                                     info.spanY = 1;
                                     info.intent.putExtra(ItemInfo.EXTRA_PROFILE, serialNumber);
-                                    info.isDisabled = isSafeMode
-                                            && !Utilities.isSystemApp(context, intent);
+                                    info.isDisabled = disabledState;
+                                    if (isSafeMode && !Utilities.isSystemApp(context, intent)) {
+                                        info.isDisabled |= ShortcutInfo.FLAG_DISABLED_SAFEMODE;
+                                    }
 
                                     // check & update map of what's occupied
-                                    deleteOnInvalidPlacement.set(false);
-                                    if (!checkItemPlacement(occupied, info, deleteOnInvalidPlacement)) {
-                                        if (deleteOnInvalidPlacement.get()) {
-                                            itemsToRemove.add(id);
-                                        }
+                                    if (!checkItemPlacement(occupied, info)) {
+                                        itemsToRemove.add(id);
                                         break;
                                     }
 
@@ -2304,12 +2273,8 @@ public class LauncherModel extends BroadcastReceiver
                                 folderInfo.hidden = c.getInt(hiddenIndex) > 0;
 
                                 // check & update map of what's occupied
-                                deleteOnInvalidPlacement.set(false);
-                                if (!checkItemPlacement(occupied, folderInfo,
-                                        deleteOnInvalidPlacement)) {
-                                    if (deleteOnInvalidPlacement.get()) {
-                                        itemsToRemove.add(id);
-                                    }
+                                if (!checkItemPlacement(occupied, folderInfo)) {
+                                    itemsToRemove.add(id);
                                     break;
                                 }
 
@@ -2392,7 +2357,7 @@ public class LauncherModel extends BroadcastReceiver
                                             // App restore has started. Update the flag
                                             appWidgetInfo.restoreStatus |=
                                                     LauncherAppWidgetInfo.FLAG_RESTORE_STARTED;
-                                        } else if (REMOVE_UNRESTORED_ICONS) {
+                                        } else if (REMOVE_UNRESTORED_ICONS && !isSafeMode) {
                                             Launcher.addDumpLog(TAG,
                                                     "Unrestored widget removed: " + component, true);
                                             itemsToRemove.add(id);
@@ -2417,12 +2382,8 @@ public class LauncherModel extends BroadcastReceiver
 
                                     appWidgetInfo.container = c.getInt(containerIndex);
                                     // check & update map of what's occupied
-                                    deleteOnInvalidPlacement.set(false);
-                                    if (!checkItemPlacement(occupied, appWidgetInfo,
-                                            deleteOnInvalidPlacement)) {
-                                        if (deleteOnInvalidPlacement.get()) {
-                                            itemsToRemove.add(id);
-                                        }
+                                    if (!checkItemPlacement(occupied, appWidgetInfo)) {
+                                        itemsToRemove.add(id);
                                         break;
                                     }
 
@@ -2875,6 +2836,9 @@ public class LauncherModel extends BroadcastReceiver
             N = appWidgets.size();
             for (int i = 0; i < N; i++) {
                 final LauncherAppWidgetInfo widget = appWidgets.get(i);
+                // Need to ensure the spans are sane (e.g. not below min spans)
+                widget.spanX = Math.max(widget.spanX, widget.minSpanX);
+                widget.spanY = Math.max(widget.spanY, widget.minSpanY);
                 final Runnable r = new Runnable() {
                     public void run() {
                         Callbacks callbacks = tryGetCallbacks(oldCallbacks);
@@ -3086,6 +3050,8 @@ public class LauncherModel extends BroadcastReceiver
 
             // Clear the list of apps
             mBgAllAppsList.clear();
+            SharedPreferences prefs = mContext.getSharedPreferences(
+                    LauncherAppState.getSharedPreferencesKey(), Context.MODE_PRIVATE);
             for (UserHandleCompat user : profiles) {
                 // Query for the set of apps
                 final long qiaTime = DEBUG_LOADERS ? SystemClock.uptimeMillis() : 0;
@@ -3096,6 +3062,7 @@ public class LauncherModel extends BroadcastReceiver
                     Log.d(TAG, "getActivityList got " + apps.size() + " apps for user " + user);
                 }
                 // Fail if we don't have any apps
+                // TODO: Fix this. Only fail for the current user.
                 if (apps == null || apps.isEmpty()) {
                     return;
                 }
@@ -3113,6 +3080,25 @@ public class LauncherModel extends BroadcastReceiver
                     LauncherActivityInfoCompat app = apps.get(i);
                     // This builds the icon bitmaps.
                     mBgAllAppsList.add(new AppInfo(mContext, app, user, mIconCache, mLabelCache));
+                }
+
+                if (ADD_MANAGED_PROFILE_SHORTCUTS && !user.equals(UserHandleCompat.myUserHandle())) {
+                    // Add shortcuts for packages which were installed while launcher was dead.
+                    String shortcutsSetKey = INSTALLED_SHORTCUTS_SET_PREFIX
+                            + mUserManager.getSerialNumberForUser(user);
+                    Set<String> packagesAdded = prefs.getStringSet(shortcutsSetKey, Collections.EMPTY_SET);
+                    HashSet<String> newPackageSet = new HashSet<String>();
+
+                    for (LauncherActivityInfoCompat info : apps) {
+                        String packageName = info.getComponentName().getPackageName();
+                        if (!packagesAdded.contains(packageName)
+                                && !newPackageSet.contains(packageName)) {
+                            InstallShortcutReceiver.queueInstallShortcut(info, mContext);
+                        }
+                        newPackageSet.add(packageName);
+                    }
+
+                    prefs.edit().putStringSet(shortcutsSetKey, newPackageSet).commit();
                 }
             }
             // Huh? Shouldn't this be inside the Runnable below?
@@ -3164,19 +3150,33 @@ public class LauncherModel extends BroadcastReceiver
             synchronized (sBgLock) {
                 final LauncherAppsCompat launcherApps = LauncherAppsCompat
                         .getInstance(mApp.getContext());
-                ArrayList<String> packagesRemoved;
+                final PackageManager manager = context.getPackageManager();
+                final ArrayList<String> packagesRemoved = new ArrayList<String>();
+                final ArrayList<String> packagesUnavailable = new ArrayList<String>();
                 for (Entry<UserHandleCompat, HashSet<String>> entry : sPendingPackages.entrySet()) {
                     UserHandleCompat user = entry.getKey();
-                    packagesRemoved = new ArrayList<String>();
+                    packagesRemoved.clear();
+                    packagesUnavailable.clear();
                     for (String pkg : entry.getValue()) {
                         if (!launcherApps.isPackageEnabledForProfile(pkg, user)) {
-                            Launcher.addDumpLog(TAG, "Package not found: " + pkg, true);
-                            packagesRemoved.add(pkg);
+                            boolean packageOnSdcard = launcherApps.isAppEnabled(
+                                    manager, pkg, PackageManager.GET_UNINSTALLED_PACKAGES);
+                            if (packageOnSdcard) {
+                                Launcher.addDumpLog(TAG, "Package found on sd-card: " + pkg, true);
+                                packagesUnavailable.add(pkg);
+                            } else {
+                                Launcher.addDumpLog(TAG, "Package not found: " + pkg, true);
+                                packagesRemoved.add(pkg);
+                            }
                         }
                     }
                     if (!packagesRemoved.isEmpty()) {
                         enqueuePackageUpdated(new PackageUpdatedTask(PackageUpdatedTask.OP_REMOVE,
                                 packagesRemoved.toArray(new String[packagesRemoved.size()]), user));
+                    }
+                    if (!packagesUnavailable.isEmpty()) {
+                        enqueuePackageUpdated(new PackageUpdatedTask(PackageUpdatedTask.OP_UNAVAILABLE,
+                                packagesUnavailable.toArray(new String[packagesUnavailable.size()]), user));
                     }
                 }
                 sPendingPackages.clear();
@@ -3265,13 +3265,37 @@ public class LauncherModel extends BroadcastReceiver
 
             final String[] packages = mPackages;
             final int N = packages.length;
-            final ArrayList<String> unavailable = new ArrayList<String>();
             switch (mOp) {
                 case OP_ADD:
                     for (int i=0; i<N; i++) {
                         if (DEBUG_LOADERS) Log.d(TAG, "mAllAppsList.addPackage " + packages[i]);
                         mIconCache.remove(packages[i], mUser);
                         mBgAllAppsList.addPackage(context, packages[i], mUser);
+                    }
+
+                    // Auto add shortcuts for added packages.
+                    if (ADD_MANAGED_PROFILE_SHORTCUTS
+                            && !UserHandleCompat.myUserHandle().equals(mUser)) {
+                        SharedPreferences prefs = context.getSharedPreferences(
+                                LauncherAppState.getSharedPreferencesKey(), Context.MODE_PRIVATE);
+                        String shortcutsSetKey = INSTALLED_SHORTCUTS_SET_PREFIX
+                                + mUserManager.getSerialNumberForUser(mUser);
+                        Set<String> shortcutSet = new HashSet<String>(
+                                prefs.getStringSet(shortcutsSetKey,Collections.EMPTY_SET));
+
+                        for (int i=0; i<N; i++) {
+                            if (!shortcutSet.contains(packages[i])) {
+                                shortcutSet.add(packages[i]);
+                                List<LauncherActivityInfoCompat> activities =
+                                        mLauncherApps.getActivityList(packages[i], mUser);
+                                if (activities != null && !activities.isEmpty()) {
+                                    InstallShortcutReceiver.queueInstallShortcut(
+                                            activities.get(0), context);
+                                }
+                            }
+                        }
+
+                        prefs.edit().putStringSet(shortcutsSetKey, shortcutSet).commit();
                     }
                     break;
                 case OP_UPDATE:
@@ -3283,15 +3307,27 @@ public class LauncherModel extends BroadcastReceiver
                     }
                     break;
                 case OP_REMOVE:
+                    // Remove the packageName for the set of auto-installed shortcuts. This
+                    // will ensure that the shortcut when the app is installed again.
+                    if (ADD_MANAGED_PROFILE_SHORTCUTS
+                            && !UserHandleCompat.myUserHandle().equals(mUser)) {
+                        SharedPreferences prefs = context.getSharedPreferences(
+                                LauncherAppState.getSharedPreferencesKey(), Context.MODE_PRIVATE);
+                        String shortcutsSetKey = INSTALLED_SHORTCUTS_SET_PREFIX
+                                + mUserManager.getSerialNumberForUser(mUser);
+                        HashSet<String> shortcutSet = new HashSet<String>(
+                                prefs.getStringSet(shortcutsSetKey, Collections.EMPTY_SET));
+                        shortcutSet.removeAll(Arrays.asList(mPackages));
+                        prefs.edit().putStringSet(shortcutsSetKey, shortcutSet).commit();
+                    }
+                    // Fall through
                 case OP_UNAVAILABLE:
+                    boolean clearCache = mOp == OP_REMOVE;
                     for (int i=0; i<N; i++) {
                         if (DEBUG_LOADERS) Log.d(TAG, "mAllAppsList.removePackage " + packages[i]);
-                        mBgAllAppsList.removePackage(packages[i], mUser);
+                        mBgAllAppsList.removePackage(packages[i], mUser, clearCache);
                         WidgetPreviewLoader.removePackageFromDb(
                                 mApp.getWidgetPreviewCacheDb(), packages[i]);
-                        if (mOp == OP_UNAVAILABLE) {
-                            unavailable.add(packages[i]);
-                        }
                     }
                     break;
             }
@@ -3313,51 +3349,37 @@ public class LauncherModel extends BroadcastReceiver
                 mBgAllAppsList.removed.clear();
             }
 
-            final Callbacks callbacks = mCallbacks != null ? mCallbacks.get() : null;
+            final Callbacks callbacks = getCallback();
             if (callbacks == null) {
                 Log.w(TAG, "Nobody to tell about the new app.  Launcher is probably loading.");
                 return;
             }
 
+            final HashMap<ComponentName, AppInfo> addedOrUpdatedApps =
+                    new HashMap<ComponentName, AppInfo>();
+
             if (added != null) {
-                final ArrayList<ItemInfo> addedInfos = new ArrayList<ItemInfo>(added);
                 // Ensure that we add all the workspace applications to the db
                 if (LauncherAppState.isDisableAllApps()) {
+                    final ArrayList<ItemInfo> addedInfos = new ArrayList<ItemInfo>(added);
                     addAndBindAddedWorkspaceApps(context, addedInfos);
                 } else {
                     addAppsToAllApps(context, added);
-                    mHandler.post(new Runnable() {
-                        public void run() {
-                            Callbacks cb = mCallbacks != null ? mCallbacks.get() : null;
-                            if (callbacks == cb && cb != null) {
-                                Log.d(TAG, "bindComponentsAvailable: " + addedInfos.size());
-                                callbacks.bindComponentsAvailable(addedInfos);
-                            }
-                        }
-                    });
+                }
+                for (AppInfo ai : added) {
+                    addedOrUpdatedApps.put(ai.componentName, ai);
                 }
             }
 
             if (modified != null) {
                 final ArrayList<AppInfo> modifiedFinal = modified;
-
-                // Update the launcher db to reflect the changes
-                for (AppInfo a : modifiedFinal) {
-                    ArrayList<ItemInfo> infos =
-                            getItemInfoForComponentName(a.componentName, mUser);
-                    for (ItemInfo i : infos) {
-                        if (isShortcutInfoUpdateable(i)) {
-                            ShortcutInfo info = (ShortcutInfo) i;
-                            info.title = a.title.toString();
-                            info.contentDescription = a.contentDescription;
-                            updateItemInDatabase(context, info);
-                        }
-                    }
+                for (AppInfo ai : modified) {
+                    addedOrUpdatedApps.put(ai.componentName, ai);
                 }
 
                 mHandler.post(new Runnable() {
                     public void run() {
-                        Callbacks cb = mCallbacks != null ? mCallbacks.get() : null;
+                        Callbacks cb = getCallback();
                         if (callbacks == cb && cb != null) {
                             callbacks.bindAppsUpdated(modifiedFinal);
                         }
@@ -3365,52 +3387,174 @@ public class LauncherModel extends BroadcastReceiver
                 });
             }
 
-            final ArrayList<String> removedPackageNames =
-                    new ArrayList<String>();
-            if (mOp == OP_REMOVE) {
-                // Mark all packages in the broadcast to be removed
-                removedPackageNames.addAll(Arrays.asList(packages));
-                // Remove all the components associated with this package
-                for (String pn : removedPackageNames) {
-                    deletePackageFromDatabase(context, pn, mUser);
+            // Update shortcut infos
+            if (mOp == OP_ADD || mOp == OP_UPDATE) {
+                final ArrayList<ShortcutInfo> updatedShortcuts = new ArrayList<ShortcutInfo>();
+                final ArrayList<ShortcutInfo> removedShortcuts = new ArrayList<ShortcutInfo>();
+                final ArrayList<LauncherAppWidgetInfo> widgets = new ArrayList<LauncherAppWidgetInfo>();
+
+                HashSet<String> packageSet = new HashSet<String>(Arrays.asList(packages));
+                synchronized (sBgLock) {
+                    for (ItemInfo info : sBgItemsIdMap.values()) {
+                        if (info instanceof ShortcutInfo && mUser.equals(info.user)) {
+                            ShortcutInfo si = (ShortcutInfo) info;
+                            boolean infoUpdated = false;
+                            boolean shortcutUpdated = false;
+
+                            // Update shortcuts which use iconResource.
+                            if ((si.iconResource != null)
+                                    && packageSet.contains(si.iconResource.packageName)) {
+                                Bitmap icon = Utilities.createIconBitmap(si.iconResource.packageName,
+                                        si.iconResource.resourceName, mIconCache, context);
+                                if (icon != null) {
+                                    si.setIcon(icon);
+                                    si.usingFallbackIcon = false;
+                                    infoUpdated = true;
+                                }
+                            }
+
+                            ComponentName cn = si.getTargetComponent();
+                            if (cn != null && packageSet.contains(cn.getPackageName())) {
+                                AppInfo appInfo = addedOrUpdatedApps.get(cn);
+
+                                if (si.isPromise()) {
+                                    mIconCache.deletePreloadedIcon(cn, mUser);
+                                    if (si.hasStatusFlag(ShortcutInfo.FLAG_AUTOINTALL_ICON)) {
+                                        // Auto install icon
+                                        PackageManager pm = context.getPackageManager();
+                                        ResolveInfo matched = pm.resolveActivity(
+                                                new Intent(Intent.ACTION_MAIN)
+                                                .setComponent(cn).addCategory(Intent.CATEGORY_LAUNCHER),
+                                                PackageManager.MATCH_DEFAULT_ONLY);
+                                        if (matched == null) {
+                                            // Try to find the best match activity.
+                                            Intent intent = pm.getLaunchIntentForPackage(
+                                                    cn.getPackageName());
+                                            if (intent != null) {
+                                                cn = intent.getComponent();
+                                                appInfo = addedOrUpdatedApps.get(cn);
+                                            }
+
+                                            if ((intent == null) || (appInfo == null)) {
+                                                removedShortcuts.add(si);
+                                                continue;
+                                            }
+                                            si.promisedIntent = intent;
+                                        }
+                                    }
+
+                                    // Restore the shortcut.
+                                    si.intent = si.promisedIntent;
+                                    si.promisedIntent = null;
+                                    si.status &= ~ShortcutInfo.FLAG_RESTORED_ICON
+                                            & ~ShortcutInfo.FLAG_AUTOINTALL_ICON
+                                            & ~ShortcutInfo.FLAG_INSTALL_SESSION_ACTIVE;
+
+                                    infoUpdated = true;
+                                    si.updateIcon(mIconCache);
+                                }
+
+                                if (appInfo != null && Intent.ACTION_MAIN.equals(si.intent.getAction())
+                                        && si.itemType == LauncherSettings.Favorites.ITEM_TYPE_APPLICATION) {
+                                    si.updateIcon(mIconCache);
+                                    si.title = appInfo.title.toString();
+                                    si.contentDescription = appInfo.contentDescription;
+                                    infoUpdated = true;
+                                }
+
+                                if ((si.isDisabled & ShortcutInfo.FLAG_DISABLED_NOT_AVAILABLE) != 0) {
+                                    // Since package was just updated, the target must be available now.
+                                    si.isDisabled &= ~ShortcutInfo.FLAG_DISABLED_NOT_AVAILABLE;
+                                    shortcutUpdated = true;
+                                }
+                            }
+
+                            if (infoUpdated || shortcutUpdated) {
+                                updatedShortcuts.add(si);
+                            }
+                            if (infoUpdated) {
+                                updateItemInDatabase(context, si);
+                            }
+                        } else if (info instanceof LauncherAppWidgetInfo) {
+                            LauncherAppWidgetInfo widgetInfo = (LauncherAppWidgetInfo) info;
+                            if (mUser.equals(widgetInfo.user)
+                                    && widgetInfo.hasRestoreFlag(LauncherAppWidgetInfo.FLAG_PROVIDER_NOT_READY)
+                                    && packageSet.contains(widgetInfo.providerName.getPackageName())) {
+                                widgetInfo.restoreStatus &= ~LauncherAppWidgetInfo.FLAG_PROVIDER_NOT_READY;
+                                widgets.add(widgetInfo);
+                                updateItemInDatabase(context, widgetInfo);
+                            }
+                        }
+                    }
                 }
-                // Remove all the specific components
-                for (AppInfo a : removedApps) {
-                    ArrayList<ItemInfo> infos = getItemInfoForComponentName(a.componentName, mUser);
-                    deleteItemsFromDatabase(context, infos);
+
+                if (!updatedShortcuts.isEmpty() || !removedShortcuts.isEmpty()) {
+                    mHandler.post(new Runnable() {
+
+                        public void run() {
+                            Callbacks cb = getCallback();
+                            if (callbacks == cb && cb != null) {
+                                callbacks.bindShortcutsChanged(
+                                        updatedShortcuts, removedShortcuts, mUser);
+                            }
+                        }
+                    });
+                    if (!removedShortcuts.isEmpty()) {
+                        deleteItemsFromDatabase(context, removedShortcuts);
+                    }
                 }
-                if (!removedPackageNames.isEmpty() || !removedApps.isEmpty()) {
-                    // Remove any queued items from the install queue
-                    String spKey = LauncherAppState.getSharedPreferencesKey();
-                    SharedPreferences sp =
-                            context.getSharedPreferences(spKey, Context.MODE_PRIVATE);
-                    InstallShortcutReceiver.removeFromInstallQueue(sp, removedPackageNames);
-                    // Call the components-removed callback
+                if (!widgets.isEmpty()) {
                     mHandler.post(new Runnable() {
                         public void run() {
-                            Callbacks cb = mCallbacks != null ? mCallbacks.get() : null;
+                            Callbacks cb = getCallback();
                             if (callbacks == cb && cb != null) {
-                                callbacks.bindComponentsRemoved(removedPackageNames, removedApps,
-                                        mUser);
+                                callbacks.bindWidgetsRestored(widgets);
                             }
                         }
                     });
                 }
+            }
+
+            final ArrayList<String> removedPackageNames =
+                    new ArrayList<String>();
+            if (mOp == OP_REMOVE || mOp == OP_UNAVAILABLE) {
+                // Mark all packages in the broadcast to be removed
+                removedPackageNames.addAll(Arrays.asList(packages));
             } else if (mOp == OP_UPDATE) {
                 // Mark disabled packages in the broadcast to be removed
-                final PackageManager pm = context.getPackageManager();
                 for (int i=0; i<N; i++) {
                     if (isPackageDisabled(context, packages[i], mUser)) {
                         removedPackageNames.add(packages[i]);
                     }
                 }
-            } else if (mOp == OP_UNAVAILABLE) {
-                // Call the packages-unavailable callback
+            }
+
+            if (!removedPackageNames.isEmpty() || !removedApps.isEmpty()) {
+                final int removeReason;
+                if (mOp == OP_UNAVAILABLE) {
+                    removeReason = ShortcutInfo.FLAG_DISABLED_NOT_AVAILABLE;
+                } else {
+                    // Remove all the components associated with this package
+                    for (String pn : removedPackageNames) {
+                        deletePackageFromDatabase(context, pn, mUser);
+                    }
+                    // Remove all the specific components
+                    for (AppInfo a : removedApps) {
+                        ArrayList<ItemInfo> infos = getItemInfoForComponentName(a.componentName, mUser);
+                        deleteItemsFromDatabase(context, infos);
+                    }
+                    removeReason = 0;
+                }
+
+                // Remove any queued items from the install queue
+                InstallShortcutReceiver.removeFromInstallQueue(context, removedPackageNames, mUser);
+                // Call the components-removed callback
                 mHandler.post(new Runnable() {
                     public void run() {
-                        Callbacks cb = mCallbacks != null ? mCallbacks.get() : null;
+                        Callbacks cb = getCallback();
                         if (callbacks == cb && cb != null) {
-                            callbacks.bindComponentsUnavailable(unavailable, removedApps);
+                            callbacks.bindComponentsRemoved(
+                                    removedPackageNames, removedApps, mUser, removeReason);
                         }
                     }
                 });
@@ -3421,7 +3565,7 @@ public class LauncherModel extends BroadcastReceiver
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    Callbacks cb = mCallbacks != null ? mCallbacks.get() : null;
+                    Callbacks cb = getCallback();
                     if (callbacks == cb && cb != null) {
                         callbacks.bindPackagesUpdated(widgetsAndShortcuts);
                     }
@@ -3431,7 +3575,7 @@ public class LauncherModel extends BroadcastReceiver
             // Write all the logs to disk
             mHandler.post(new Runnable() {
                 public void run() {
-                    Callbacks cb = mCallbacks != null ? mCallbacks.get() : null;
+                    Callbacks cb = getCallback();
                     if (callbacks == cb && cb != null) {
                         callbacks.dumpLogsToLocalData();
                     }
@@ -3660,26 +3804,6 @@ public class LauncherModel extends BroadcastReceiver
         return filterItemInfos(sBgItemsIdMap.values(), filter);
     }
 
-    public static boolean isShortcutInfoUpdateable(ItemInfo i) {
-        if (i instanceof ShortcutInfo) {
-            ShortcutInfo info = (ShortcutInfo) i;
-            // We need to check for ACTION_MAIN otherwise getComponent() might
-            // return null for some shortcuts (for instance, for shortcuts to
-            // web pages.)
-            Intent intent = info.intent;
-            ComponentName name = intent.getComponent();
-            if (info.itemType == LauncherSettings.Favorites.ITEM_TYPE_APPLICATION &&
-                    Intent.ACTION_MAIN.equals(intent.getAction()) && name != null) {
-                return true;
-            }
-            // placeholder shortcuts get special treatment, let them through too.
-            if (info.isPromise()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     /**
      * Make an ShortcutInfo object for a shortcut that isn't an application.
      */
@@ -3702,19 +3826,9 @@ public class LauncherModel extends BroadcastReceiver
         case LauncherSettings.Favorites.ICON_TYPE_RESOURCE:
             String packageName = c.getString(iconPackageIndex);
             String resourceName = c.getString(iconResourceIndex);
-            PackageManager packageManager = context.getPackageManager();
             info.customIcon = false;
             // the resource
-            try {
-                Resources resources = packageManager.getResourcesForApplication(packageName);
-                if (resources != null) {
-                    final int id = resources.getIdentifier(resourceName, null, null);
-                    icon = Utilities.createIconBitmap(
-                            mIconCache.getFullResIcon(resources, id), context);
-                }
-            } catch (Exception e) {
-                // drop this.  we have other places to look for icons
-            }
+            icon = Utilities.createIconBitmap(packageName, resourceName, mIconCache, context);
             // the db
             if (icon == null) {
                 icon = getIconFromCursor(c, iconIndex, context);
@@ -3761,17 +3875,6 @@ public class LauncherModel extends BroadcastReceiver
         }
     }
 
-    ShortcutInfo addShortcut(Context context, Intent data, long container, int screen,
-            int cellX, int cellY, boolean notify) {
-        final ShortcutInfo info = infoFromShortcutIntent(context, data, null);
-        if (info == null) {
-            return null;
-        }
-        addItemToDatabase(context, info, container, screen, cellX, cellY, notify);
-
-        return info;
-    }
-
     /**
      * Attempts to find an AppWidgetProviderInfo that matches the given component.
      */
@@ -3787,7 +3890,7 @@ public class LauncherModel extends BroadcastReceiver
         return null;
     }
 
-    ShortcutInfo infoFromShortcutIntent(Context context, Intent data, Bitmap fallbackIcon) {
+    ShortcutInfo infoFromShortcutIntent(Context context, Intent data) {
         Intent intent = data.getParcelableExtra(Intent.EXTRA_SHORTCUT_INTENT);
         String name = data.getStringExtra(Intent.EXTRA_SHORTCUT_NAME);
         Parcelable bitmap = data.getParcelableExtra(Intent.EXTRA_SHORTCUT_ICON);
@@ -3802,24 +3905,15 @@ public class LauncherModel extends BroadcastReceiver
         boolean customIcon = false;
         ShortcutIconResource iconResource = null;
 
-        if (bitmap != null && bitmap instanceof Bitmap) {
-            icon = Utilities.createIconBitmap(new FastBitmapDrawable((Bitmap)bitmap), context);
+        if (bitmap instanceof Bitmap) {
+            icon = Utilities.createIconBitmap((Bitmap) bitmap, context);
             customIcon = true;
         } else {
             Parcelable extra = data.getParcelableExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE);
-            if (extra != null && extra instanceof ShortcutIconResource) {
-                try {
-                    iconResource = (ShortcutIconResource) extra;
-                    final PackageManager packageManager = context.getPackageManager();
-                    Resources resources = packageManager.getResourcesForApplication(
-                            iconResource.packageName);
-                    final int id = resources.getIdentifier(iconResource.resourceName, null, null);
-                    icon = Utilities.createIconBitmap(
-                            mIconCache.getFullResIcon(resources, id),
-                            context);
-                } catch (Exception e) {
-                    Log.w(TAG, "Could not load shortcut icon: " + extra);
-                }
+            if (extra instanceof ShortcutIconResource) {
+                iconResource = (ShortcutIconResource) extra;
+                icon = Utilities.createIconBitmap(iconResource.packageName,
+                        iconResource.resourceName, mIconCache, context);
             }
         }
 
@@ -3829,12 +3923,8 @@ public class LauncherModel extends BroadcastReceiver
         // users wouldn't get here without intent forwarding anyway.
         info.user = UserHandleCompat.myUserHandle();
         if (icon == null) {
-            if (fallbackIcon != null) {
-                icon = fallbackIcon;
-            } else {
-                icon = mIconCache.getDefaultIcon(info.user);
-                info.usingFallbackIcon = true;
-            }
+            icon = mIconCache.getDefaultIcon(info.user);
+            info.usingFallbackIcon = true;
         }
         info.setIcon(icon);
 
@@ -4034,5 +4124,9 @@ public class LauncherModel extends BroadcastReceiver
         } else {
             Log.d(TAG, "mLoaderTask=null");
         }
+    }
+
+    public Callbacks getCallback() {
+        return mCallbacks != null ? mCallbacks.get() : null;
     }
 }
